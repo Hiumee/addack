@@ -1,0 +1,30 @@
+tr.htmx-swapping td {
+    opacity: 0;
+    transition: opacity 1s ease-out;
+}
+
+#alerts-container {
+    pointer-events: none;
+}
+
+#alerts {
+    pointer-events: all;
+}
+
+#alerts .fade-out {
+    animation: fadeInAnimation ease 10s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+ 
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 1;
+    }
+    70% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+     }
+}
