@@ -12,6 +12,7 @@ tr.htmx-swapping td {
 }
 
 #alerts .fade-out {
+    overflow: hidden;
     animation: fadeInAnimation ease 10s;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
@@ -20,11 +21,17 @@ tr.htmx-swapping td {
 @keyframes fadeInAnimation {
     0% {
         opacity: 1;
+        max-height: 200px;
+        margin-bottom: 0.5rem;
     }
     70% {
         opacity: 1;
+        max-height: 200px;
+        margin-bottom: 0.5rem;
     }
     100% {
         opacity: 0;
+        max-height: 0;
+        margin-bottom: 0;
      }
 }
