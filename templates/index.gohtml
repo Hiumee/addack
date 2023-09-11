@@ -5,6 +5,7 @@
 
     <script src="/assets/js/htmx.js"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/remove-me.js"></script>
+    <!-- <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script> -->
 
     <link rel="stylesheet" href="/assets/css/index.css">
 
@@ -13,19 +14,21 @@
     </script>
 </head>
 
+<body ws-connect="/ws">
+
 <div class="hidden" id="blackhole">
 </div>
 
 <div id="alerts-container" class="absolute w-full mt-8">
-    <div id="alerts" class="w-80 float-right flex flex-col">
+    <div id="alerts" class="z-30 w-80 float-right flex flex-col">
         
     </div>
 </div>
 
 
-<body class="flex flex-col h-screen">
+<div class="flex flex-col h-screen">
     <header>
-        <div class="w-full">
+        <div class="-mb-12 w-full">
             <div class="p-4 text-left">
                 <h1 class="text-2xl font-bold text-gray-900 sm:text-3xl">
                     Addack
@@ -61,13 +64,21 @@
         <div id="tab1">
             <div class="flex flex-col h-full">
                 <div class="h-1/2 flex">
-                    <div class="w-80 m-6 overflow-scroll border-gray-200 border-2 rounded-md">
+                    <div class="grow m-6 overflow-scroll border-gray-200 border-2 rounded-md">
                         <div id="challenges" hx-get="/challenges" hx-trigger="load" hx-swap="outerHTML">
                             Load challenges
                         </div>
                     </div>
                     <div class="w-80 m-6 overflow-scroll border-gray-200 border-2 rounded-md">
                         {{ template "new-challange-form" . }}
+                    </div>
+                    <div class="grow m-6 overflow-scroll border-gray-200 border-2 rounded-md">
+                        <div id="targets" hx-get="/targets" hx-trigger="load" hx-swap="outerHTML">
+                            Load targets
+                        </div>
+                    </div>
+                    <div class="w-80 m-6 overflow-scroll border-gray-200 border-2 rounded-md">
+                        {{ template "new-target-form" . }}
                     </div>
                 </div>
                 <div class="h-1/2">
@@ -102,5 +113,6 @@
         }
     }
   </script>
+</div>
 </body>
 {{ end }}

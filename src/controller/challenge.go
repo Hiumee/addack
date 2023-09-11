@@ -2,8 +2,12 @@ package controller
 
 import (
 	"addack/src/model"
+	"fmt"
 	"net/http"
+	"os"
+	"path"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,9 +27,18 @@ func (c *Controller) GetChallenges(context *gin.Context) {
 func (c *Controller) CreateChallenge(context *gin.Context) {
 	var challenge model.Challenge
 
+	form, err := context.MultipartForm()
+	if err != nil {
+		fmt.Println(err)
+		SendError(context, "An error occured parsing the form")
+		return
+	}
+
 	challenge.Name = context.PostForm("name")
 	challenge.Command = context.PostForm("command")
-	challenge.Path = context.PostForm("path")
+	cleanPath := path.Clean("/" + strings.Trim(context.PostForm("path"), "/"))
+	challenge.Path = cleanPath
+	challenge.Tag = context.PostForm("tag")
 
 	if challenge.Name == "" || challenge.Command == "" || challenge.Path == "" {
 		SendError(context, "All challenge fields must be filled out")
@@ -34,11 +47,31 @@ func (c *Controller) CreateChallenge(context *gin.Context) {
 
 	id, err := c.DB.CreateChallenge(challenge)
 	if err != nil {
-		SendError(context, "Could not create challenge")
+		SendError(context, err.Error())
 		return
 	}
 
-	context.HTML(http.StatusOK, "challenge-row-new", gin.H{"Name": challenge.Name, "Id": id, "Notice": "Challenge created"})
+	if _, err := os.Stat(c.Config.ExploitsPath); os.IsNotExist(err) {
+		os.Mkdir(c.Config.ExploitsPath, 0755)
+	}
+
+	challengePath := path.Join(c.Config.ExploitsPath, challenge.Path)
+
+	if _, err := os.Stat(challengePath); os.IsNotExist(err) {
+		os.Mkdir(challengePath, 0755)
+	}
+
+	for _, file := range form.File["files"] {
+		filename := path.Base(file.Filename)
+		err := context.SaveUploadedFile(file, path.Join(challengePath, filename))
+		if err != nil {
+			fmt.Println(err)
+			SendError(context, "Could not save file")
+			return
+		}
+	}
+
+	context.HTML(http.StatusOK, "challenge-row-new", gin.H{"Name": challenge.Name, "Id": id, "Notice": "Challenge created", "Tag": challenge.Tag})
 	return
 }
 

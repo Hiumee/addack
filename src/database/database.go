@@ -31,5 +31,9 @@ func (db *Database) RunMigrations() error {
 	if err != nil {
 		return err
 	}
+	err = db.CreateTargetsTable()
+	if err != nil {
+		return err
+	}
 	return nil
 }

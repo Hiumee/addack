@@ -5,4 +5,5 @@ type Challenge struct {
 	Name    string
 	Command string
 	Path    string
+	Tag     string
 }

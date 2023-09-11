@@ -1,5 +1,5 @@
-{{ block "challenges" . }}
-<div id="challenges" hx-trigger="every 10s" hx-get="/challenges">
+{{ block "targets" . }}
+<div id="targets" hx-trigger="every 10s" hx-get="/targets">
     <div class="overflow-x-auto">
     <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
         <thead>
@@ -8,17 +8,20 @@
             Name
             </th>
             <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-            Flags
+            IP
             </th>
             <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
             Tag
             </th>
+            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            Flags
+            </th>
             <th class="px-4 py-2 w-16">
-                <button hx-delete="/challenges"
+                <button hx-delete="/targets"
                     href="#"
                     class="inline-block rounded bg-red-400 w-full py-2 text-xs font-medium text-white hover:bg-red-500"
-                    hx-target="#challenges"
-                    hx-confirm="Are you sure you want to delete ALL challenges?"
+                    hx-target="#targets"
+                    hx-confirm="Are you sure you want to delete ALL targets?"
                     hx-swap="outerHTML"
                 >
                     Delete All
@@ -27,9 +30,9 @@
         </tr>
         </thead>
 
-        <tbody id="challenges-table" hx-confirm="Are you sure you want to delete this challenge?" hx-target="closest tr" hx-swap="outerHTML swap:1s" class="divide-y divide-gray-200">
-        {{ range .Challenges }}
-            {{ template "challenge-row" . }}
+        <tbody id="targets-table" hx-confirm="Are you sure you want to delete this target?" hx-target="closest tr" hx-swap="outerHTML swap:1s" class="divide-y divide-gray-200">
+        {{ range .Targets }}
+            {{ template "target-row" . }}
         {{ end }}
         </tbody>
     </table>
@@ -37,15 +40,16 @@
 </div>
 {{ end }}
 
-{{ block "challenge-row" . }}
+{{ block "target-row" . }}
 <tr>
     <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
     {{ .Name }}
     </td>
-    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">0</td>
+    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Ip }}</td>
     <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Tag }}</td>
+    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">0</td>
     <td class="whitespace-nowrap px-4 py-2 flex justify-center items-center">
-        <button hx-delete="/challenge/{{ .Id }}"
+        <button hx-delete="/target/{{ .Id }}"
             href="#"
             class="inline-block rounded bg-red-400 px-4 py-2 text-xs font-medium text-white hover:bg-red-500"
         >
@@ -55,16 +59,18 @@
 </tr>
 {{ end }}
 
-{{ block "challenge-row-new" .}}
-<tbody hx-swap-oob="beforeend:#challenges-table">
+
+{{ block "target-row-new" .}}
+<tbody hx-swap-oob="beforeend:#targets-table">
     <tr>
         <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
         {{ .Name }}
         </td>
-        <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">0</td>
+        <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Ip }}</td>
         <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Tag }}</td>
+        <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">0</td>
         <td class="whitespace-nowrap px-4 py-2 flex justify-center items-center">
-            <button hx-delete="/challenge/{{ .Id }}"
+            <button hx-delete="/target/{{ .Id }}"
                 href="#"
                 class="inline-block rounded bg-red-400 px-4 py-2 text-xs font-medium text-white hover:bg-red-500"
             >
@@ -74,24 +80,24 @@
     </tr>
 </tbody>
 
-{{ template "new-challange-form" . }}
+{{ template "new-target-form" . }}
 {{ end }}
 
-{{ block "new-challange-form" . }}
+
+{{ block "new-target-form" . }}
 {{ template "notice" . }}
-<form id="new-challenge-form" hx-post="/challenges" class="p-4 flex flex-col gap-2" enctype="multipart/form-data">
+<form id="new-target-form" hx-post="/targets" class="p-4 flex flex-col gap-2">
     <label
-    for="ChallengeName"
+    for="TargetName"
     class="relative block overflow-hidden rounded-md border border-gray-200 px-3 pt-3 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600"
     >
     <input
         type="text"
-        id="ChallengeName"
+        id="TargetName"
         placeholder="Name"
         name="name"
         value=""
         class="peer h-8 w-full border-none bg-transparent p-0 placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0 sm:text-sm"
-        onchange="updateChallangePath(this)"
     />
 
     <span
@@ -100,16 +106,16 @@
         Name
     </span>
     </label>
-
+    
     <label
-    for="ChallengePath"
+    for="TargetIp"
     class="relative block overflow-hidden rounded-md border border-gray-200 px-3 pt-3 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600"
     >
     <input
         type="text"
-        id="ChallengePath"
-        placeholder="Path"
-        name="path"
+        id="TargetIp"
+        placeholder="Ip"
+        name="ip"
         value=""
         class="peer h-8 w-full border-none bg-transparent p-0 placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0 sm:text-sm"
     />
@@ -117,45 +123,23 @@
     <span
         class="absolute start-3 top-3 -translate-y-1/2 text-xs text-gray-700 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-focus:top-3 peer-focus:text-xs"
     >
-        Path
+        IP
     </span>
     </label>
 
     
     <label
-    for="ChallengeCommand"
+    for="TargetTag"
     class="relative block overflow-hidden rounded-md border border-gray-200 px-3 pt-3 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600"
     >
     <input
         type="text"
-        id="ChallengeCommand"
-        placeholder="Command"
-        name="command"
-        value=""
-        class="peer h-8 w-full border-none bg-transparent p-0 placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0 sm:text-sm"
-    />
-
-    <span
-        class="absolute start-3 top-3 -translate-y-1/2 text-xs text-gray-700 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-focus:top-3 peer-focus:text-xs"
-    >
-        Command
-    </span>
-    </label>
-
-    
-    <label
-    for="ChallengeTag"
-    class="relative block overflow-hidden rounded-md border border-gray-200 px-3 pt-3 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600"
-    >
-    <input
-        type="text"
-        id="ChallengeTag"
+        id="TargetTag"
         placeholder="Tag"
         name="tag"
         value=""
         class="peer h-8 w-full border-none bg-transparent p-0 placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0 sm:text-sm"
     />
-
     <span
         class="absolute start-3 top-3 -translate-y-1/2 text-xs text-gray-700 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-focus:top-3 peer-focus:text-xs"
     >
@@ -163,14 +147,6 @@
     </span>
     </label>
 
-    <label for="file-input" class="sr-only">Choose file</label>
-    <input type="file" multiple name="files" id="files" class="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400
-        file:bg-transparent file:border-0
-        file:bg-gray-100 file:mr-4
-        file:py-3 file:px-4
-        dark:file:bg-gray-700 dark:file:text-gray-400">
-
-
-    <button class="block rounded bg-gray-700 px-5 py-3 text-sm text-gray-100 transition hover:bg-gray-600">Create challenge</button>
+    <button class="block rounded bg-gray-700 px-5 py-3 text-sm text-gray-100 transition hover:bg-gray-600">Create target</button>
 </form>
 {{ end }}
