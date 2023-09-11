@@ -64,21 +64,25 @@
         <div id="tab1">
             <div class="flex flex-col h-full">
                 <div class="h-1/2 flex">
-                    <div class="grow m-6 overflow-scroll border-gray-200 border-2 rounded-md">
-                        <div id="challenges" hx-get="/challenges" hx-trigger="load" hx-swap="outerHTML">
-                            Load challenges
+                    <div class="flex w-1/2">
+                        <div class="grow m-6 overflow-scroll border-gray-200 border-2 rounded-md">
+                            <div id="challenges" hx-get="/challenges" hx-trigger="load" hx-swap="outerHTML">
+                                Load challenges
+                            </div>
+                        </div>
+                        <div class="w-80 m-6 overflow-scroll border-gray-200 border-2 rounded-md">
+                            {{ template "new-challange-form" . }}
                         </div>
                     </div>
-                    <div class="w-80 m-6 overflow-scroll border-gray-200 border-2 rounded-md">
-                        {{ template "new-challange-form" . }}
-                    </div>
-                    <div class="grow m-6 overflow-scroll border-gray-200 border-2 rounded-md">
-                        <div id="targets" hx-get="/targets" hx-trigger="load" hx-swap="outerHTML">
-                            Load targets
+                    <div class="flex w-1/2">
+                        <div class="grow m-6 overflow-scroll border-gray-200 border-2 rounded-md">
+                            <div id="targets" hx-get="/targets" hx-trigger="load" hx-swap="outerHTML">
+                                Load targets
+                            </div>
                         </div>
-                    </div>
-                    <div class="w-80 m-6 overflow-scroll border-gray-200 border-2 rounded-md">
-                        {{ template "new-target-form" . }}
+                        <div class="w-80 m-6 overflow-scroll border-gray-200 border-2 rounded-md">
+                            {{ template "new-target-form" . }}
+                        </div>
                     </div>
                 </div>
                 <div class="h-1/2">
