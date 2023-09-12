@@ -12,6 +12,8 @@ type Config struct {
 	ExploitsPath string
 	TickTime     int64
 	FlagRegex    string
+	TimeZone     string
+	TimeFormat   string
 }
 
 type Controller struct {

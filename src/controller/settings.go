@@ -25,8 +25,22 @@ func (c *Controller) SaveConfig(context *gin.Context) {
 		return
 	}
 
+	timeZone := context.PostForm("timeZone")
+	if timeZone == "" {
+		SendError(context, "Time zone cannot be empty")
+		return
+	}
+
+	timeFormat := context.PostForm("timeFormat")
+	if timeFormat == "" {
+		SendError(context, "Time format cannot be empty")
+		return
+	}
+
 	c.Config.FlagRegex = flagRegex
 	c.Config.TickTime = tickRate
+	c.Config.TimeZone = timeZone
+	c.Config.TimeFormat = timeFormat
 
 	context.HTML(http.StatusOK, "settings", gin.H{"Config": c.Config})
 }

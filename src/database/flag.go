@@ -2,10 +2,11 @@ package database
 
 import (
 	"addack/src/model"
+	"time"
 )
 
 func (db *Database) CreateFlagsTable() error {
-	_, err := db.DB.Exec("CREATE TABLE IF NOT EXISTS flags (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, flag TEXT, exploit_id INTEGER, target_id INTEGER, result TEXT, valid BOOLEAN)")
+	_, err := db.DB.Exec("CREATE TABLE IF NOT EXISTS flags (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, flag TEXT, exploit_id INTEGER, target_id INTEGER, result TEXT, valid BOOLEAN, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")
 	return err
 }
 
@@ -21,19 +22,31 @@ func (db *Database) CreateFlag(flag model.Flag) (int64, error) {
 	return id, nil
 }
 
-func (db *Database) GetFlags() ([]model.FlagDTO, error) {
+func (db *Database) GetFlags(timezone string, timeformat string) ([]model.FlagDTO, error) {
 	var flags []model.FlagDTO
-	rows, err := db.DB.Query("SELECT flags.id, flag, exploits.name, targets.name, valid FROM flags INNER JOIN exploits ON exploits.id = flags.exploit_id INNER JOIN targets ON targets.id = flags.target_id ORDER BY flags.id DESC LIMIT 100")
+	rows, err := db.DB.Query("SELECT flags.id, flag, exploits.name, targets.name, valid, timestamp FROM flags INNER JOIN exploits ON exploits.id = flags.exploit_id INNER JOIN targets ON targets.id = flags.target_id ORDER BY flags.id DESC LIMIT 100")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var flag model.FlagDTO
-		err := rows.Scan(&flag.Id, &flag.Flag, &flag.ExploitName, &flag.TargetName, &flag.Valid)
+		var timestamp string
+		err := rows.Scan(&flag.Id, &flag.Flag, &flag.ExploitName, &flag.TargetName, &flag.Valid, &timestamp)
 		if err != nil {
 			return nil, err
 		}
+		flagTime, err := time.Parse(time.RFC3339, timestamp)
+		if err != nil {
+			return nil, err
+		}
+
+		location, err := time.LoadLocation(timezone)
+		if err != nil {
+			return nil, err
+		}
+		flag.Timestamp = flagTime.In(location).Format(timeformat)
+
 		flags = append(flags, flag)
 	}
 

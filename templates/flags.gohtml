@@ -16,6 +16,9 @@
             <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
             Flag
             </th>
+            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            Timestamp
+            </th>
         </tr>
         </thead>
 
@@ -35,6 +38,7 @@
     <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .ExploitName }}</td>
     <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .TargetName }}</td>
     <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Flag }}</td>
+    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Timestamp }}</td>
 </tr>
 {{ end }}
 

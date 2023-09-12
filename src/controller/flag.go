@@ -8,7 +8,7 @@ import (
 )
 
 func (c *Controller) GetFlags(context *gin.Context) {
-	flags, err := c.DB.GetFlags()
+	flags, err := c.DB.GetFlags(c.Config.TimeZone, c.Config.TimeFormat)
 	if err != nil {
 		SendError(context, err.Error())
 		return

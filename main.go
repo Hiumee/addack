@@ -27,6 +27,8 @@ func main() {
 			ExploitsPath: "./exploits",
 			TickTime:     10 * 1000,
 			FlagRegex:    "FLAG{.*}",
+			TimeZone:     "Europe/Bucharest",
+			TimeFormat:   "2006-01-02 15:04:05",
 		},
 	}
 	ctrl.ExploitRunner = controller.NewExploitRunner(ctrl)

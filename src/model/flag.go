@@ -16,4 +16,5 @@ type FlagDTO struct {
 	TargetName  string
 	Result      string
 	Valid       bool
+	Timestamp   string
 }
