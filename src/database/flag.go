@@ -2,7 +2,6 @@ package database
 
 import (
 	"addack/src/model"
-	"log"
 )
 
 func (db *Database) CreateFlagsTable() error {
@@ -37,7 +36,7 @@ func (db *Database) GetFlags() ([]model.FlagDTO, error) {
 		}
 		flags = append(flags, flag)
 	}
-	log.Default().Println(flags)
+
 	return flags, nil
 }
 
