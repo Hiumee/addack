@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os/exec"
+	"regexp"
 	"sync"
 	"time"
 )
@@ -70,11 +71,24 @@ func (r *Runner) Run() {
 			close(r.Notify)
 			return
 		case <-done:
+			result := string(output.Bytes())
+			flagRegex := r.Controller.Config.FlagRegex
+			flagString := ""
+
+			re, err := regexp.Compile(flagRegex)
+
+			if err != nil {
+				log.Default().Println("Runner error", "Can't compile regex", flagRegex)
+			} else {
+				flagString = re.FindString(result)
+			}
+
 			flag := &model.Flag{
 				ExploitId: r.Exploit.Id,
 				TargetId:  r.Target.Id,
-				Result:    string(output.Bytes()),
-				Valid:     true,
+				Result:    result,
+				Valid:     flagString != "",
+				Flag:      flagString,
 			}
 			r.Flagger <- flag
 		case <-timer.C:

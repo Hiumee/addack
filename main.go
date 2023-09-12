@@ -26,6 +26,7 @@ func main() {
 		Config: &controller.Config{
 			ExploitsPath: "./exploits",
 			TickTime:     10 * 1000,
+			FlagRegex:    "FLAG{.*}",
 		},
 	}
 	ctrl.ExploitRunner = controller.NewExploitRunner(ctrl)
@@ -106,6 +107,8 @@ func main() {
 	// Flag routes
 	r.GET("/flags", ctrl.GetFlags)
 	r.GET("/flag/:id", ctrl.GetFlag)
+	// Settings routes
+	r.POST("/settings", ctrl.SaveConfig)
 
 	// go ctrl.Hub.Run()
 

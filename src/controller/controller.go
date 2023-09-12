@@ -11,6 +11,7 @@ import (
 type Config struct {
 	ExploitsPath string
 	TickTime     int64
+	FlagRegex    string
 }
 
 type Controller struct {
@@ -21,7 +22,7 @@ type Controller struct {
 }
 
 func (c *Controller) GetIndex(context *gin.Context) {
-	context.HTML(http.StatusOK, "index", gin.H{})
+	context.HTML(http.StatusOK, "index", gin.H{"Config": c.Config})
 	return
 }
 
