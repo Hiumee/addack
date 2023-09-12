@@ -124,8 +124,10 @@ func (er *ExploitRunner) addExploit(exploit *model.Exploit) {
 	er.runner[exploit.Id] = make(map[int64]*Runner)
 
 	for _, target := range er.targets {
-		er.runner[exploit.Id][target.Id] = er.NewRunner(exploit, target)
-		go er.runner[exploit.Id][target.Id].Run()
+		if exploit.Tag == "" || target.Tag == "" || exploit.Tag == target.Tag {
+			er.runner[exploit.Id][target.Id] = er.NewRunner(exploit, target)
+			go er.runner[exploit.Id][target.Id].Run()
+		}
 	}
 
 	log.Default().Println("ExploitRunner added exploit", exploit.Name)
@@ -159,8 +161,10 @@ func (er *ExploitRunner) addTarget(target *model.Target) {
 	er.targets[target.Id] = target
 
 	for _, exploit := range er.exploits {
-		er.runner[exploit.Id][target.Id] = er.NewRunner(exploit, target)
-		go er.runner[exploit.Id][target.Id].Run()
+		if exploit.Tag == "" || target.Tag == "" || exploit.Tag == target.Tag {
+			er.runner[exploit.Id][target.Id] = er.NewRunner(exploit, target)
+			go er.runner[exploit.Id][target.Id].Run()
+		}
 	}
 
 	log.Default().Println("ExploitRunner added target", target.Name)
