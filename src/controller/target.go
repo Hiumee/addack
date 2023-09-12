@@ -38,6 +38,11 @@ func (c *Controller) CreateTarget(context *gin.Context) {
 		return
 	}
 
+	target.Id = id
+
+	tg := target
+	c.ExploitRunner.TargetAdder <- &tg
+
 	context.HTML(http.StatusOK, "target-row-new", gin.H{"Name": target.Name, "Id": id, "Ip": target.Ip, "Notice": "Target created", "Tag": target.Tag})
 	return
 }
@@ -55,6 +60,8 @@ func (c *Controller) DeleteTarget(context *gin.Context) {
 		return
 	}
 
+	c.ExploitRunner.TargetRemover <- &model.Target{Id: id}
+
 	context.HTML(http.StatusOK, "notice", gin.H{"Notice": "Target deleted"})
 	return
 }
@@ -64,6 +71,17 @@ func (c *Controller) DeleteAllTargets(context *gin.Context) {
 	if err != nil {
 		SendError(context, err.Error())
 		return
+	}
+
+	targets := make([]*model.Target, 0)
+
+	for _, target := range c.ExploitRunner.targets {
+		targets = append(targets, target)
+	}
+
+	for _, target := range targets {
+		tg := *target
+		c.ExploitRunner.TargetRemover <- &tg
 	}
 
 	c.GetTargets(context)

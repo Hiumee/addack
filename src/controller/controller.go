@@ -10,12 +10,14 @@ import (
 
 type Config struct {
 	ExploitsPath string
+	TickTime     int64
 }
 
 type Controller struct {
-	DB     *database.Database
-	Hub    *Hub
-	Config *Config
+	DB            *database.Database
+	Hub           *Hub
+	Config        *Config
+	ExploitRunner *ExploitRunner
 }
 
 func (c *Controller) GetIndex(context *gin.Context) {

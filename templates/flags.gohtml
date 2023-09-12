@@ -1,0 +1,45 @@
+{{ block "flags" . }}
+<div id="flags" hx-trigger="every 10s" hx-get="/flags">
+    <div class="overflow-x-auto">
+    <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+        <thead>
+        <tr>
+            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900 text-left">
+            ID
+            </th>
+            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            Exploit
+            </th>
+            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            Target
+            </th>
+            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            Flag
+            </th>
+        </tr>
+        </thead>
+
+        <tbody id="flags-table" class="divide-y divide-gray-200">
+        {{ range .Flags }}
+            {{ template "flag-row" . }}
+        {{ end }}
+        </tbody>
+    </table>
+    </div>
+</div>
+{{ end }}
+
+{{ block "flag-row" . }}
+<tr hx-trigger="click" hx-target="#flag-preview" hx-swap="innerHTML" hx-get="/flag/{{ .Id }}" class="{{ if .Valid }}bg-green-50{{else}}bg-red-50{{end}}">
+    <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ .Id }}</td>
+    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .ExploitName }}</td>
+    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .TargetName }}</td>
+    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Flag }}</td>
+</tr>
+{{ end }}
+
+{{ block "flag-preview" . }}
+<pre>
+{{ .Result }}
+</pre>
+{{ end }}

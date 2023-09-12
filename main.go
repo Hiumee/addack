@@ -20,7 +20,36 @@ func main() {
 	}
 	defer database.DB.Close()
 
-	ctrl := &controller.Controller{DB: database, Hub: controller.NewHub(), Config: &controller.Config{ExploitsPath: "./exploits"}}
+	ctrl := &controller.Controller{
+		DB:  database,
+		Hub: controller.NewHub(),
+		Config: &controller.Config{
+			ExploitsPath: "./exploits",
+			TickTime:     10 * 1000,
+		},
+	}
+	ctrl.ExploitRunner = controller.NewExploitRunner(ctrl)
+
+	go ctrl.ExploitRunner.Run()
+
+	{
+		exploits, err := ctrl.DB.GetExploits()
+		if err != nil {
+			panic(err)
+		}
+		for _, exploit := range exploits {
+			ex := exploit
+			ctrl.ExploitRunner.ExploitAdder <- &ex
+		}
+		targets, err := ctrl.DB.GetTargets()
+		if err != nil {
+			panic(err)
+		}
+		for _, target := range targets {
+			tg := target
+			ctrl.ExploitRunner.TargetAdder <- &tg
+		}
+	}
 
 	r := gin.Default()
 
@@ -68,6 +97,9 @@ func main() {
 	r.POST("/targets", ctrl.CreateTarget)
 	r.DELETE("/targets", ctrl.DeleteAllTargets)
 	r.DELETE("/target/:id", ctrl.DeleteTarget)
+	// Flag routes
+	r.GET("/flags", ctrl.GetFlags)
+	r.GET("/flag/:id", ctrl.GetFlag)
 
 	// go ctrl.Hub.Run()
 
