@@ -58,7 +58,12 @@ func main() {
 		}
 	}
 
-	r := gin.Default()
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
+
+	r.Use(
+		gin.Recovery(),
+	)
 
 	r.MaxMultipartMemory = 50 << 20 // 50 MiB
 	r.Static("/assets", "./assets")
