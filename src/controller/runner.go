@@ -20,11 +20,9 @@ type Runner struct {
 
 type ExploitRunner struct {
 	exploits       map[int64]*model.Exploit
-	exploitsLock   sync.RWMutex
 	ExploitAdder   chan *model.Exploit
 	ExploitRemover chan *model.Exploit
 	targets        map[int64]*model.Target
-	targetsLock    sync.RWMutex
 	TargetAdder    chan *model.Target
 	TargetRemover  chan *model.Target
 	runner         map[int64]map[int64]*Runner
@@ -92,11 +90,9 @@ func (r *Runner) Run() {
 func NewExploitRunner(controller *Controller) *ExploitRunner {
 	return &ExploitRunner{
 		exploits:       make(map[int64]*model.Exploit),
-		exploitsLock:   sync.RWMutex{},
 		ExploitAdder:   make(chan *model.Exploit, 5),
 		ExploitRemover: make(chan *model.Exploit, 5),
 		targets:        make(map[int64]*model.Target),
-		targetsLock:    sync.RWMutex{},
 		TargetAdder:    make(chan *model.Target, 5),
 		TargetRemover:  make(chan *model.Target, 5),
 		runner:         make(map[int64]map[int64]*Runner),
@@ -107,30 +103,26 @@ func NewExploitRunner(controller *Controller) *ExploitRunner {
 }
 
 func (er *ExploitRunner) addExploit(exploit *model.Exploit) {
-	er.exploitsLock.Lock()
-	er.exploits[exploit.Id] = exploit
-	er.exploitsLock.Unlock()
+	er.runnerLock.RLock()
+	defer er.runnerLock.RUnlock()
 
-	er.targetsLock.RLock()
-	er.runnerLock.Lock()
+	er.exploits[exploit.Id] = exploit
 	er.runner[exploit.Id] = make(map[int64]*Runner)
 
 	for _, target := range er.targets {
 		er.runner[exploit.Id][target.Id] = er.NewRunner(exploit, target)
 		go er.runner[exploit.Id][target.Id].Run()
 	}
-	er.runnerLock.Unlock()
-	er.targetsLock.RUnlock()
 
 	log.Default().Println("ExploitRunner added exploit", exploit.Name)
 }
 
 func (er *ExploitRunner) removeExploit(exploit *model.Exploit) {
-	er.exploitsLock.Lock()
-	delete(er.exploits, exploit.Id)
-	er.exploitsLock.Unlock()
-
 	er.runnerLock.Lock()
+	defer er.runnerLock.Unlock()
+
+	delete(er.exploits, exploit.Id)
+
 	runners := []*Runner{}
 
 	for _, runner := range er.runner[exploit.Id] {
@@ -139,43 +131,38 @@ func (er *ExploitRunner) removeExploit(exploit *model.Exploit) {
 
 	for _, runner := range runners {
 		runner.Notify <- "stop"
-		delete(er.runner[exploit.Id], runner.Target.Id)
 	}
-	er.runnerLock.Unlock()
+
+	delete(er.runner, exploit.Id)
 
 	log.Default().Println("ExploitRunner removed exploit", exploit.Id)
-	log.Default().Println(er.runner)
 }
 
 func (er *ExploitRunner) addTarget(target *model.Target) {
-	er.targetsLock.Lock()
+	er.runnerLock.RLock()
+	defer er.runnerLock.RUnlock()
+
 	er.targets[target.Id] = target
-	er.targetsLock.Unlock()
-	er.exploitsLock.RLock()
-	er.runnerLock.Lock()
+
 	for _, exploit := range er.exploits {
 		er.runner[exploit.Id][target.Id] = er.NewRunner(exploit, target)
 		go er.runner[exploit.Id][target.Id].Run()
 	}
-	er.runnerLock.Unlock()
-	er.exploitsLock.RUnlock()
 
 	log.Default().Println("ExploitRunner added target", target.Name)
 }
 
 func (er *ExploitRunner) removeTarget(target *model.Target) {
-	er.targetsLock.Lock()
-	delete(er.targets, target.Id)
-	er.targetsLock.Unlock()
-
 	er.runnerLock.Lock()
+	defer er.runnerLock.Unlock()
+
+	delete(er.targets, target.Id)
 
 	for id, exploit := range er.runner {
 		runner := exploit[target.Id]
 		runner.Notify <- "stop"
 		delete(er.runner[id], runner.Target.Id)
 	}
-	er.runnerLock.Unlock()
 
 	log.Default().Println("ExploitRunner removed target", target.Id)
 }
