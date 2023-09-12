@@ -1,6 +1,6 @@
 {{ block "error" .}}
 <div hx-swap-oob="beforeend:#alerts">
-<div hx-ext="remove-me" remove-me="10s" role="alert" class="fade-out mb-2 mr-8 rounded border-s-4 border-red-500 bg-red-50">
+<div hx-ext="remove-me" onclick="this.remove()" remove-me="10s" role="alert" class="fade-out hover:bg-red-100 mb-2 mr-8 rounded border-s-4 border-red-500 bg-red-50">
     <div class="flex items-center gap-2 text-red-800 p-4">
         <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -32,7 +32,7 @@
 {{ block "notice" .}}
 {{ if and . .Notice}}
 <div hx-swap-oob="beforeend:#alerts">
-<div hx-ext="remove-me" remove-me="10s" role="alert" class="fade-out mb-2 mr-8 rounded border-s-4 border-green-500 bg-green-50">
+<div hx-ext="remove-me" onclick="this.remove()" remove-me="10s" role="alert" class="fade-out hover:bg-green-100 mb-2 mr-8 rounded border-s-4 border-green-500 bg-green-50">
     <div class="flex items-center gap-2 text-green-800 p-4">
         <strong class="block font-medium"> Success </strong>
     </div>

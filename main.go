@@ -38,16 +38,20 @@ func main() {
 			panic(err)
 		}
 		for _, exploit := range exploits {
-			ex := exploit
-			ctrl.ExploitRunner.ExploitAdder <- &ex
+			if exploit.Enabled {
+				ex := exploit
+				ctrl.ExploitRunner.ExploitAdder <- &ex
+			}
 		}
 		targets, err := ctrl.DB.GetTargets()
 		if err != nil {
 			panic(err)
 		}
 		for _, target := range targets {
-			tg := target
-			ctrl.ExploitRunner.TargetAdder <- &tg
+			if target.Enabled {
+				tg := target
+				ctrl.ExploitRunner.TargetAdder <- &tg
+			}
 		}
 	}
 
@@ -92,11 +96,13 @@ func main() {
 	r.POST("/exploits", ctrl.CreateExploit)
 	r.DELETE("/exploits", ctrl.DeleteAllExploits)
 	r.DELETE("/exploit/:id", ctrl.DeleteExploit)
+	r.POST("/exploit/:id/:enable", ctrl.ToggleExploit)
 	// Target routes
 	r.GET("/targets", ctrl.GetTargets)
 	r.POST("/targets", ctrl.CreateTarget)
 	r.DELETE("/targets", ctrl.DeleteAllTargets)
 	r.DELETE("/target/:id", ctrl.DeleteTarget)
+	r.POST("/target/:id/:enable", ctrl.ToggleTarget)
 	// Flag routes
 	r.GET("/flags", ctrl.GetFlags)
 	r.GET("/flag/:id", ctrl.GetFlag)

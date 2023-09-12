@@ -125,6 +125,40 @@
             path.value = name.value.toLowerCase().replace(/ /g, "-");
         }
     }
+
+    function toggleExploitEnable() {
+        let enable = document.getElementById("ExploitEnabledToggle");
+        let enabled = document.getElementById("ExploitEnabled");
+        if (enabled.value == "on") {
+            enabled.value = "off";
+        } else {
+            enabled.value = "on";
+        }
+        enable.classList.toggle("bg-green-500");
+        enable.classList.toggle("bg-red-500");
+        if (enabled.value == "on") {
+            enable.innerText = "Enabled";
+        } else {
+            enable.innerText = "Disabled";
+        }
+    }
+
+    function toggleTargetEnable() {
+        let enable = document.getElementById("TargetEnabledToggle");
+        let enabled = document.getElementById("TargetEnabled");
+        if (enabled.value == "on") {
+            enabled.value = "off";
+        } else {
+            enabled.value = "on";
+        }
+        enable.classList.toggle("bg-green-500");
+        enable.classList.toggle("bg-red-500");
+        if (enabled.value == "on") {
+            enable.innerText = "Enabled";
+        } else {
+            enable.innerText = "Disabled";
+        }
+    }
   </script>
 </div>
 </body>
