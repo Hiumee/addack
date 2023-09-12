@@ -27,7 +27,7 @@ func NewDatabase(path string) (*Database, error) {
 }
 
 func (db *Database) RunMigrations() error {
-	err := db.CreateChallengesTable()
+	err := db.CreateExploitsTable()
 	if err != nil {
 		return err
 	}

@@ -66,8 +66,8 @@
                 <div class="h-1/2 flex">
                     <div class="flex w-1/2">
                         <div class="grow m-6 overflow-scroll border-gray-200 border-2 rounded-md">
-                            <div id="challenges" hx-get="/challenges" hx-trigger="load" hx-swap="outerHTML">
-                                Load challenges
+                            <div id="exploits" hx-get="/exploits" hx-trigger="load" hx-swap="outerHTML">
+                                Load exploits
                             </div>
                         </div>
                         <div class="w-80 m-6 overflow-scroll border-gray-200 border-2 rounded-md">
@@ -111,7 +111,7 @@
     }
 
     function updateChallangePath(name) {
-        let path = document.getElementById("ChallengePath");
+        let path = document.getElementById("ExploitPath");
         if (path.value == "") {
             path.value = name.value.toLowerCase().replace(/ /g, "-");
         }

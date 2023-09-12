@@ -58,11 +58,11 @@ func main() {
 	// 	}()
 	// })
 
-	// Challenge routes
-	r.GET("/challenges", ctrl.GetChallenges)
-	r.POST("/challenges", ctrl.CreateChallenge)
-	r.DELETE("/challenges", ctrl.DeleteAllChallenges)
-	r.DELETE("/challenge/:id", ctrl.DeleteChallenge)
+	// Exploit routes
+	r.GET("/exploits", ctrl.GetExploits)
+	r.POST("/exploits", ctrl.CreateExploit)
+	r.DELETE("/exploits", ctrl.DeleteAllExploits)
+	r.DELETE("/exploit/:id", ctrl.DeleteExploit)
 	// Target routes
 	r.GET("/targets", ctrl.GetTargets)
 	r.POST("/targets", ctrl.CreateTarget)
