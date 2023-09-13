@@ -4,7 +4,6 @@ import (
 	"addack/src/model"
 	"bytes"
 	"io"
-	"log"
 	"os/exec"
 	"regexp"
 	"sync"
@@ -43,7 +42,7 @@ func (er *ExploitRunner) NewRunner(exploit *model.Exploit, target *model.Target)
 }
 
 func (r *Runner) Run() {
-	log.Default().Println("Runner started", r.Exploit.Name, r.Target.Name)
+	r.Controller.Logger.Println("Runner started", r.Exploit.Name, r.Target.Name)
 	tickTicker := time.NewTicker(time.Duration(r.Controller.Config.TickTime) * time.Millisecond)
 	defer tickTicker.Stop()
 	for {
@@ -56,7 +55,7 @@ func (r *Runner) Run() {
 		cmd.Stdout = writer
 
 		if err := cmd.Start(); err != nil {
-			log.Default().Println("Runner error", r.Exploit.Name, r.Target.Name, err)
+			r.Controller.Logger.Println("Runner error", r.Exploit.Name, r.Target.Name, err)
 			<-tickTicker.C
 			continue
 		}
@@ -68,7 +67,7 @@ func (r *Runner) Run() {
 		timer := time.NewTimer(time.Duration(r.Exploit.Timeout) * time.Millisecond)
 		select {
 		case <-r.Notify:
-			log.Default().Println("Runner stopped", r.Exploit.Name, r.Target.Name)
+			r.Controller.Logger.Println("Runner stopped", r.Exploit.Name, r.Target.Name)
 			cmd.Process.Kill()
 			close(r.Notify)
 			timer.Stop()
@@ -81,10 +80,12 @@ func (r *Runner) Run() {
 			re, err := regexp.Compile(flagRegex)
 
 			if err != nil {
-				log.Default().Println("Runner error", "Can't compile regex", flagRegex)
+				r.Controller.Logger.Println("Runner error", "Can't compile regex", flagRegex)
 			} else {
 				flagString = re.FindString(result)
 			}
+
+			r.Controller.Logger.Println("Runner result", r.Exploit.Name, r.Target.Name, flagString)
 
 			flag := &model.Flag{
 				ExploitId: r.Exploit.Id,
@@ -133,7 +134,7 @@ func (er *ExploitRunner) addExploit(exploit *model.Exploit) {
 		}
 	}
 
-	log.Default().Println("ExploitRunner added exploit", exploit.Name)
+	er.controller.Logger.Println("ExploitRunner added exploit", exploit.Name)
 }
 
 func (er *ExploitRunner) removeExploit(exploit *model.Exploit) {
@@ -154,7 +155,7 @@ func (er *ExploitRunner) removeExploit(exploit *model.Exploit) {
 
 	delete(er.runner, exploit.Id)
 
-	log.Default().Println("ExploitRunner removed exploit", exploit.Id)
+	er.controller.Logger.Println("ExploitRunner removed exploit", exploit.Id)
 }
 
 func (er *ExploitRunner) addTarget(target *model.Target) {
@@ -170,7 +171,7 @@ func (er *ExploitRunner) addTarget(target *model.Target) {
 		}
 	}
 
-	log.Default().Println("ExploitRunner added target", target.Name)
+	er.controller.Logger.Println("ExploitRunner added target", target.Name)
 }
 
 func (er *ExploitRunner) removeTarget(target *model.Target) {
@@ -185,11 +186,11 @@ func (er *ExploitRunner) removeTarget(target *model.Target) {
 		delete(er.runner[id], runner.Target.Id)
 	}
 
-	log.Default().Println("ExploitRunner removed target", target.Id)
+	er.controller.Logger.Println("ExploitRunner removed target", target.Id)
 }
 
 func (er *ExploitRunner) Run() {
-	log.Default().Println("ExploitRunner started")
+	er.controller.Logger.Println("ExploitRunner started")
 	for {
 		select {
 		case exploit := <-er.ExploitAdder:

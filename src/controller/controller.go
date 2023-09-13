@@ -2,6 +2,7 @@ package controller
 
 import (
 	"addack/src/database"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,7 @@ type Controller struct {
 	Hub           *Hub
 	Config        *Config
 	ExploitRunner *ExploitRunner
+	Logger        *log.Logger
 }
 
 func (c *Controller) GetIndex(context *gin.Context) {
