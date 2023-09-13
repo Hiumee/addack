@@ -3,7 +3,10 @@ package main
 import (
 	"addack/src/controller"
 	"addack/src/database"
+	"embed"
+	"io/fs"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +18,15 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+//go:embed assets/**/* assets/js/* assets/css/output.css assets/favicon.ico templates/*
+var staticContent embed.FS
+
 func main() {
+	staticFS, err := fs.Sub(staticContent, "assets")
+	if err != nil {
+		panic(err)
+	}
+
 	database, err := database.NewDatabase("database.db")
 	if err != nil {
 		panic(err)
@@ -67,10 +78,12 @@ func main() {
 	r.Use(
 		gin.Recovery(),
 	)
+	// r := gin.Default()
 
 	r.MaxMultipartMemory = 50 << 20 // 50 MiB
-	r.Static("/assets", "./assets")
-	r.LoadHTMLGlob("templates/*")
+	r.StaticFS("/assets", http.FS(staticFS))
+	LoadHTMLFromEmbedFS(r, staticContent, "templates/*")
+	// r.LoadHTMLGlob("templates/*")
 
 	r.GET("/", ctrl.GetIndex)
 
