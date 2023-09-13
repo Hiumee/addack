@@ -78,12 +78,10 @@ func main() {
 	r.Use(
 		gin.Recovery(),
 	)
-	// r := gin.Default()
 
 	r.MaxMultipartMemory = 50 << 20 // 50 MiB
 	r.StaticFS("/assets", http.FS(staticFS))
 	LoadHTMLFromEmbedFS(r, staticContent, "templates/*")
-	// r.LoadHTMLGlob("templates/*")
 
 	r.GET("/", ctrl.GetIndex)
 
