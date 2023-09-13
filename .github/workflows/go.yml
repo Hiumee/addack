@@ -29,7 +29,7 @@ jobs:
       run: npx tailwindcss -i ./assets/css/index.css -o ./assets/css/output.css
 
     - name: Build
-      run: CGO_ENABLED=0 go build -o addack -ldflags="-extldflags=-static"
+      run: go build -o addack -ldflags="-extldflags=-static"
 
     - name: Release
       id: create_release
