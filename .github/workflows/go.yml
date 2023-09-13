@@ -35,16 +35,25 @@ jobs:
       id: date
       run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M')"
       
+    - name: Get tag version
+      id: taggerDryRun
+      uses: anothrNick/github-tag-action@1.36.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: true
+        DRY_RUN: true
+        
     - name: Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: release-${{ github.sha }}
+        tag_name: ${{ steps.taggerDryRun.outputs.new_tag }}
         release_name: Release ${{steps.date.outputs.date}}
         draft: false
         prerelease: false
+        
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
