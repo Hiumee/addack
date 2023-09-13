@@ -44,6 +44,8 @@ func (er *ExploitRunner) NewRunner(exploit *model.Exploit, target *model.Target)
 
 func (r *Runner) Run() {
 	log.Default().Println("Runner started", r.Exploit.Name, r.Target.Name)
+	tickTicker := time.NewTicker(time.Duration(r.Controller.Config.TickTime) * time.Millisecond)
+	defer tickTicker.Stop()
 	for {
 		var output bytes.Buffer
 
@@ -55,7 +57,7 @@ func (r *Runner) Run() {
 
 		if err := cmd.Start(); err != nil {
 			log.Default().Println("Runner error", r.Exploit.Name, r.Target.Name, err)
-			time.Sleep(time.Duration(r.Controller.Config.TickTime) * time.Millisecond)
+			<-tickTicker.C
 			continue
 		}
 		done := make(chan error, 1)
@@ -69,6 +71,7 @@ func (r *Runner) Run() {
 			log.Default().Println("Runner stopped", r.Exploit.Name, r.Target.Name)
 			cmd.Process.Kill()
 			close(r.Notify)
+			timer.Stop()
 			return
 		case <-done:
 			result := string(output.Bytes())
@@ -92,12 +95,12 @@ func (r *Runner) Run() {
 			}
 			r.Flagger <- flag
 		case <-timer.C:
-			log.Default().Println("Runner timeout", r.Exploit.Name, r.Target.Name)
+			<-tickTicker.C
 		}
 
 		timer.Stop()
 
-		time.Sleep(time.Duration(r.Controller.Config.TickTime) * time.Millisecond)
+		<-tickTicker.C
 	}
 }
 
