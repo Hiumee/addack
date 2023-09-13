@@ -29,7 +29,7 @@ jobs:
       run: npx tailwindcss -i ./assets/css/index.css -o ./assets/css/output.css
 
     - name: Build
-      run: go build . -o addack
+      run: go build -o addack
 
     - name: Release
       id: create_release
