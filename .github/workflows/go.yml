@@ -1,0 +1,54 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  release:
+    name: Create release
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Set up Node
+      uses: actions/setup-node@v3
+
+    - name: Install node packages
+      run: npm i
+
+    - name: Build tailwind
+      run: npx tailwindcss -i ./assets/css/index.css -o ./assets/css/output.css
+
+    - name: Build
+      run: go build -o addack
+
+    - name: Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: release-${{ github.sha }}
+        release_name: release-${{ github.sha }}
+        draft: false
+        prerelease: false
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./addack
+        asset_name: addack
+        asset_content_type: application/octet-stream
+    
