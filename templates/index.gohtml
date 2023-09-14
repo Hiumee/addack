@@ -37,12 +37,12 @@
         </div>
         <div>
             <div class="border-b border-gray-200">
-                <nav class="-mb-px flex justify-center gap-6">
+                <nav id="navbar" class="-mb-px flex justify-center gap-6">
                     <a
                     href="#"
                     class="tab-selected shrink-0 rounded-t-lg border border-gray-300 border-b-white p-3 text-sm font-medium text-sky-600"
-                    onclick="selectTab(this)"
-                    data-element="tab1"
+                    hx-get="/main"
+                    hx-target="#tab"
                     >
                     Overview
                     </a>
@@ -50,8 +50,8 @@
                     <a
                     href="#"
                     class="shrink-0 border border-transparent p-3 text-sm font-medium text-gray-500 hover:text-gray-700"
-                    onclick="selectTab(this)"
-                    data-element="tab2"
+                    hx-get="/settings"
+                    hx-target="#tab"
                     >
                     Settings
                     </a>
@@ -61,63 +61,13 @@
     </header>
 
     <div class="h-full">
-        <div id="tab1" class="h-full">
-            <div class="flex flex-col h-full">
-                <div class="h-1/2 px-6 pt-6 pb-0 flex gap-4">
-                    <div class="flex w-1/2 gap-4">
-                        <div class="grow overflow-scroll border-gray-200 border-2 rounded-md">
-                            <div id="exploits" hx-get="/exploits" hx-trigger="load" hx-swap="outerHTML">
-                                Load exploits
-                            </div>
-                        </div>
-                        <div class="w-80 overflow-scroll border-gray-200 border-2 rounded-md">
-                            {{ template "new-challange-form" . }}
-                        </div>
-                    </div>
-                    <div class="flex w-1/2 gap-4">
-                        <div class="grow overflow-scroll border-gray-200 border-2 rounded-md">
-                            <div id="targets" hx-get="/targets" hx-trigger="load" hx-swap="outerHTML">
-                                Load targets
-                            </div>
-                        </div>
-                        <div class="w-80 overflow-scroll border-gray-200 border-2 rounded-md">
-                            {{ template "new-target-form" . }}
-                        </div>
-                    </div>
-                </div>
-                <div class="h-1/2 p-6 flex gap-4">
-                    <div class="grow h-full overflow-scroll border-gray-200 border-2 rounded-md">
-                        <div id="flags" hx-get="/flags" hx-trigger="load" hx-swap="outerHTML">
-                            Load flags
-                        </div>
-                    </div>
-                    <div class="w-1/3 h-full overflow-scroll border-gray-200 border-2 rounded-md">
-                        <div id="flag-preview" class="h-full p-2">
-                            Select a flag to preview
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="tab2" class="hidden h-full">
-            {{ template "settings" . }}
+        <div id="tab" class="h-full">
+            {{ template "main" . }}
         </div>
     </div>
 
       
     <script type="text/javascript">
-    function selectTab(button) {
-        let elem = document.getElementsByClassName("tab-selected")[0];      
-        if (elem) {
-            elem.className = "shrink-0 border border-transparent p-3 text-sm font-medium text-gray-500 hover:text-gray-700";
-            let tab = document.getElementById(elem.getAttribute("data-element"));
-            tab.className = "hidden";
-        }
-        button.className = "tab-selected shrink-0 rounded-t-lg border border-gray-300 border-b-white p-3 text-sm font-medium text-sky-600";
-        let tab = document.getElementById(button.getAttribute("data-element"));
-        tab.className = "";
-    }
 
     function updateChallangePath(name) {
         let path = document.getElementById("ExploitPath");
@@ -162,4 +112,63 @@
   </script>
 </div>
 </body>
+{{ end }}
+
+{{ block "main" . }}
+<div class="flex flex-col h-full">
+    <div class="h-1/2 px-6 pt-6 pb-0 flex gap-4">
+        <div class="flex w-1/2 gap-4">
+            <div class="grow overflow-scroll border-gray-200 border-2 rounded-md">
+                <div id="exploits" hx-get="/exploits" hx-trigger="load" hx-swap="outerHTML">
+                    Load exploits
+                </div>
+            </div>
+            <div class="w-80 overflow-scroll border-gray-200 border-2 rounded-md">
+                {{ template "new-challange-form" . }}
+            </div>
+        </div>
+        <div class="flex w-1/2 gap-4">
+            <div class="grow overflow-scroll border-gray-200 border-2 rounded-md">
+                <div id="targets" hx-get="/targets" hx-trigger="load" hx-swap="outerHTML">
+                    Load targets
+                </div>
+            </div>
+            <div class="w-80 overflow-scroll border-gray-200 border-2 rounded-md">
+                {{ template "new-target-form" . }}
+            </div>
+        </div>
+    </div>
+    <div class="h-1/2 p-6 flex gap-4">
+        <div class="grow h-full overflow-scroll border-gray-200 border-2 rounded-md">
+            <div id="flags" hx-get="/flags" hx-trigger="load" hx-swap="outerHTML">
+                Load flags
+            </div>
+        </div>
+        <div class="w-1/3 h-full overflow-scroll border-gray-200 border-2 rounded-md">
+            <div id="flag-preview" class="h-full p-2">
+                Select a flag to preview
+            </div>
+        </div>
+    </div>
+</div>
+
+<nav id="navbar" class="-mb-px flex justify-center gap-6" hx-swap-oob="true">
+    <a
+        href="#"
+        class="tab-selected shrink-0 rounded-t-lg border border-gray-300 border-b-white p-3 text-sm font-medium text-sky-600"
+        hx-get="/main"
+        hx-target="#tab"
+    >
+        Overview
+    </a>
+
+    <a
+        href="#"
+        class="shrink-0 border border-transparent p-3 text-sm font-medium text-gray-500 hover:text-gray-700"
+        hx-get="/settings"
+        hx-target="#tab"
+    >
+        Settings
+    </a>
+<nav>
 {{ end }}

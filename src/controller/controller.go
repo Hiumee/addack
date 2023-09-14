@@ -30,6 +30,16 @@ func (c *Controller) GetIndex(context *gin.Context) {
 	return
 }
 
+func (c *Controller) GetMain(context *gin.Context) {
+	context.HTML(http.StatusOK, "main", gin.H{"Config": c.Config})
+	return
+}
+
+func (c *Controller) GetSettings(context *gin.Context) {
+	context.HTML(http.StatusOK, "settings", gin.H{"Config": c.Config})
+	return
+}
+
 func SendError(context *gin.Context, err string) {
 	context.Header("HX-Retarget", "#blackhole")
 	context.Header("HX-Reswap", "innerHTML")

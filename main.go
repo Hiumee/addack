@@ -84,6 +84,8 @@ func main() {
 	LoadHTMLFromEmbedFS(r, staticContent, "templates/*")
 
 	r.GET("/", ctrl.GetIndex)
+	r.GET("/main", ctrl.GetMain)
+	r.GET("/settings", ctrl.GetSettings)
 
 	// Websocket
 	// r.GET("/ws", func(c *gin.Context) {
