@@ -4,6 +4,7 @@ import (
 	"addack/src/database"
 	"log"
 	"net/http"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,7 +12,7 @@ import (
 type Config struct {
 	ExploitsPath   string
 	TickTime       int64
-	FlagRegex      string
+	FlagRegex      *regexp.Regexp
 	TimeZone       string
 	TimeFormat     string
 	FlaggerCommand string

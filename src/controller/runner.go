@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"io"
 	"os/exec"
-	"regexp"
 	"sync"
 	"time"
 )
@@ -75,16 +74,9 @@ func (r *Runner) Run() {
 			return
 		case <-done:
 			result := string(output.Bytes())
-			flagRegex := r.Controller.Config.FlagRegex
 			flagString := ""
 
-			re, err := regexp.Compile(flagRegex)
-
-			if err != nil {
-				r.Controller.Logger.Println("Runner error", "Can't compile regex", flagRegex)
-			} else {
-				flagString = re.FindString(result)
-			}
+			flagString = r.Controller.Config.FlagRegex.FindString(result)
 
 			r.Controller.Logger.Println("Runner result", r.Exploit.Name, r.Target.Name, flagString)
 

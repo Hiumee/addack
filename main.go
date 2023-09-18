@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -34,13 +35,19 @@ func main() {
 	}
 	defer database.DB.Close()
 
+	defaultRegex := "FLAG{.*}"
+	regex, err := regexp.Compile(defaultRegex)
+	if err != nil {
+		panic(err)
+	}
+
 	ctrl := &controller.Controller{
 		DB: database,
 		Config: &controller.Config{
 			FlaggerCommand: "python3 flagger.py",
 			ExploitsPath:   "./exploits",
 			TickTime:       10 * 1000,
-			FlagRegex:      "FLAG{.*}",
+			FlagRegex:      regex,
 			TimeZone:       "Europe/Bucharest",
 			TimeFormat:     "2006-01-02 15:04:05",
 		},

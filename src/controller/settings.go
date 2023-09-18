@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -37,8 +38,15 @@ func (c *Controller) SaveConfig(context *gin.Context) {
 		return
 	}
 
+	re, err := regexp.Compile(flagRegex)
+
+	if err != nil {
+		SendError(context, err.Error())
+		return
+	}
+
 	c.Config.FlaggerCommand = context.PostForm("flaggerCommand")
-	c.Config.FlagRegex = flagRegex
+	c.Config.FlagRegex = re
 	c.Config.TickTime = tickRate
 	c.Config.TimeZone = timeZone
 	c.Config.TimeFormat = timeFormat
