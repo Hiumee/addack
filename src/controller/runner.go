@@ -53,6 +53,7 @@ func (r *Runner) Run() {
 		cmd.Env = append(cmd.Env, "TARGET="+r.Target.Ip)
 		writer := io.Writer(&output)
 		cmd.Stdout = writer
+		cmd.Stderr = writer
 
 		if err := cmd.Start(); err != nil {
 			r.Controller.Logger.Println("Runner error", r.Exploit.Name, r.Target.Name, err)
@@ -214,7 +215,7 @@ func (er *ExploitRunner) Run() {
 				er.controller.Logger.Println("ExploitRunner error", "Could not save flag", err)
 				continue
 			}
-			if flag.Valid == "matched" {
+			if er.controller.Config.FlaggerCommand != "" && flag.Valid == "matched" {
 				flag.Id = id
 				go SendFlag(*flag, er.controller)
 			}

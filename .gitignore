@@ -1,5 +1,6 @@
 tmp
 *.db
-exploits
+exploits/*
+!exploits/flagger.py
 node_modules
 assets/css/output.css

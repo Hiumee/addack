@@ -4,7 +4,9 @@ import (
 	"addack/src/controller"
 	"addack/src/database"
 	"embed"
+	"io/fs"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -20,11 +22,11 @@ var upgrader = websocket.Upgrader{
 var staticContent embed.FS
 
 func main() {
-	// Uncomment if you want to use embedded assets
-	// staticFS, err := fs.Sub(staticContent, "assets")
-	// if err != nil {
-	// 	panic(err)
-	// }
+	// Comment if you don't want to use embedded FS
+	staticFS, err := fs.Sub(staticContent, "assets")
+	if err != nil {
+		panic(err)
+	}
 
 	database, err := database.NewDatabase("database.db")
 	if err != nil {
@@ -35,11 +37,12 @@ func main() {
 	ctrl := &controller.Controller{
 		DB: database,
 		Config: &controller.Config{
-			ExploitsPath: "./exploits",
-			TickTime:     10 * 1000,
-			FlagRegex:    "FLAG{.*}",
-			TimeZone:     "Europe/Bucharest",
-			TimeFormat:   "2006-01-02 15:04:05",
+			FlaggerCommand: "python3 flagger.py",
+			ExploitsPath:   "./exploits",
+			TickTime:       10 * 1000,
+			FlagRegex:      "FLAG{.*}",
+			TimeZone:       "Europe/Bucharest",
+			TimeFormat:     "2006-01-02 15:04:05",
 		},
 		Logger: log.New(os.Stdout, "[ExploitRunner] ", log.LstdFlags),
 	}
@@ -76,14 +79,15 @@ func main() {
 	r.Use(
 		gin.Recovery(),
 	)
+	// r.Use(gin.Logger()) - Comment out if you want to see gin logs
 
 	r.MaxMultipartMemory = 50 << 20 // 50 MiB
 
-	// Switch comments if you want to use embedded assets
-	// r.StaticFS("/assets", http.FS(staticFS))
-	// LoadHTMLFromEmbedFS(r, staticContent, "templates/*")
-	r.Static("/assets", "./assets")
-	r.LoadHTMLGlob("templates/*")
+	// Switch comments if you don't want to use embedded FS
+	r.StaticFS("/assets", http.FS(staticFS))
+	LoadHTMLFromEmbedFS(r, staticContent, "templates/*")
+	// r.Static("/assets", "./assets")
+	// r.LoadHTMLGlob("templates/*")
 
 	r.GET("/", ctrl.GetIndex)
 	r.GET("/main", ctrl.GetMain)

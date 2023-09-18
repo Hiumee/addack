@@ -37,6 +37,7 @@ func (c *Controller) SaveConfig(context *gin.Context) {
 		return
 	}
 
+	c.Config.FlaggerCommand = context.PostForm("flaggerCommand")
 	c.Config.FlagRegex = flagRegex
 	c.Config.TickTime = tickRate
 	c.Config.TimeZone = timeZone
