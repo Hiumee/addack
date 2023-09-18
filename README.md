@@ -2,6 +2,8 @@
 
 Addack is a tool to run exploits to multiple targets.
 
+![image](https://github.com/Hiumee/addack/assets/42638867/b65f5647-299b-4be9-9bb3-75d764a02647)
+
 ## Instalation
 
 ### Download
