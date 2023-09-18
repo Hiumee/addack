@@ -8,9 +8,11 @@ Addack is a tool to run exploits to multiple targets.
 
 Download the binary from the [release page](https://github.com/Hiumee/addack/releases)
 
-Run the binary. A `database.db` file will be created in the same directory.
+Make an `exploits` directory in the same directory as the binary. Add a script called `flagger.py` in the `exploits` directory. This script will be called when a flag is found.
 
-Edit the `flagger.py` file to send the flag to the server. The command to run the exploit is in the `FlaggerCommand` variable. The directory used for this command is the `ExploitsPath` variable.
+The command to run the exploit is in the `FlaggerCommand` variable. The directory used for this command is the `ExploitsPath` variable.
+
+Run the binary. A `database.db` file will be created in the same directory.
 
 Default configuration:
 
