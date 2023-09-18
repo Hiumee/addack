@@ -25,6 +25,8 @@ TimeZone:       "Europe/Bucharest",
 TimeFormat:     "2006-01-02 15:04:05",
 ```
 
+Upload scripts and set the command to run. The IP of the target will be set in the `TARGET` environment variable when the script is run.
+
 ## Development
 
 ### Requirements
