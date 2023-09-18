@@ -2,12 +2,11 @@ package database
 
 import (
 	"addack/src/model"
-	"database/sql"
 	"time"
 )
 
 func (db *Database) CreateFlagsTable() error {
-	_, err := db.DB.Exec("CREATE TABLE IF NOT EXISTS flags (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, flag TEXT, exploit_id INTEGER, target_id INTEGER, result TEXT, valid BOOLEAN, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")
+	_, err := db.DB.Exec("CREATE TABLE IF NOT EXISTS flags (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, flag TEXT, exploit_id INTEGER, target_id INTEGER, result TEXT, valid TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")
 	return err
 }
 
@@ -61,45 +60,28 @@ func (db *Database) SearchFlags(timezone string, timeformat string, exploit stri
 	exploit = "%" + exploit + "%"
 	target = "%" + target + "%"
 	flag = "%" + flag + "%"
+	valid = valid + "%"
 	content = "%" + content + "%"
 
-	var rows *sql.Rows
+	if valid == "" {
+		valid = "%"
+	}
 
-	if valid != "" {
-		var err error
-		rows, err = db.DB.Query(`
-			SELECT flags.id, flag, exploits.name, targets.name, valid, timestamp FROM flags 
-				INNER JOIN exploits ON exploits.id = flags.exploit_id
-				INNER JOIN targets ON targets.id = flags.target_id
-			WHERE
-				exploits.name LIKE $1 AND
-				targets.name LIKE $2 AND
-				flags.flag LIKE $3 AND
-				valid LIKE $4 AND
-				result LIKE $5
-			ORDER BY flags.id DESC LIMIT 100
-			`, exploit, target, flag, valid == "true", content)
+	rows, err := db.DB.Query(`
+		SELECT flags.id, flag, exploits.name, targets.name, valid, timestamp FROM flags 
+			INNER JOIN exploits ON exploits.id = flags.exploit_id
+			INNER JOIN targets ON targets.id = flags.target_id
+		WHERE
+			exploits.name LIKE $1 AND
+			targets.name LIKE $2 AND
+			flags.flag LIKE $3 AND
+			valid LIKE $4 AND
+			result LIKE $5
+		ORDER BY flags.id DESC LIMIT 100
+		`, exploit, target, flag, valid, content)
 
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		var err error
-		rows, err = db.DB.Query(`
-			SELECT flags.id, flag, exploits.name, targets.name, valid, timestamp FROM flags 
-				INNER JOIN exploits ON exploits.id = flags.exploit_id
-				INNER JOIN targets ON targets.id = flags.target_id
-			WHERE
-				exploits.name LIKE $1 AND
-				targets.name LIKE $2 AND
-				flags.flag LIKE $3 AND
-				result LIKE $5
-			ORDER BY flags.id DESC LIMIT 100
-			`, exploit, target, flag, content)
-
-		if err != nil {
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -149,4 +131,9 @@ func (db *Database) GetFlagResult(id int64) (string, error) {
 	var result string
 	err := db.DB.QueryRow("SELECT result FROM flags WHERE id = $1", id).Scan(&result)
 	return result, err
+}
+
+func (db *Database) UpdateFlagStatus(id int64, status string) error {
+	_, err := db.DB.Exec("UPDATE flags SET valid = $1 WHERE id = $2", status, id)
+	return err
 }

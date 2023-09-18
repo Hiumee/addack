@@ -14,6 +14,9 @@
             Target
             </th>
             <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            Status
+            </th>
+            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
             Flag
             </th>
             <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
@@ -33,10 +36,11 @@
 {{ end }}
 
 {{ block "flag-row" . }}
-<tr hx-trigger="click" hx-target="#flag-preview" hx-swap="innerHTML" hx-get="/flag/{{ .Id }}" class="{{ if .Valid }}bg-green-50{{else}}bg-red-50{{end}}">
+<tr hx-trigger="click" hx-target="#flag-preview" hx-swap="innerHTML" hx-get="/flag/{{ .Id }}" class="{{ if eq .Valid "valid" }}bg-green-50{{ else if eq .Valid "matched" }}bg-yellow-50{{ else }}bg-red-50{{ end }}">
     <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ .Id }}</td>
     <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .ExploitName }}</td>
     <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .TargetName }}</td>
+    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Valid }}</td>
     <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Flag }}</td>
     <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Timestamp }}</td>
 </tr>
@@ -65,8 +69,10 @@
         <div>Valid</div>
         <select name="valid" hx-post="/flags" hx-target="#flags" class="w-40 px-2 py-1 rounded-md border-gray-200 bg-white border-2">
             <option value="">Any</option>
-            <option value="true">Valid</option>
-            <option value="false">Invalid</option>
+            <option value="valid">Valid</option>
+        <option value="invalid">Invalid</option>
+            <option value="matched">Matched</option>
+            <option value="not matched">Not matched</option>
         </select>
 
         <div>Content</div>

@@ -6,7 +6,7 @@ type Flag struct {
 	ExploitId int64
 	TargetId  int64
 	Result    string
-	Valid     bool
+	Valid     string
 }
 
 type FlagDTO struct {
@@ -15,6 +15,6 @@ type FlagDTO struct {
 	ExploitName string
 	TargetName  string
 	Result      string
-	Valid       bool
+	Valid       string
 	Timestamp   string
 }

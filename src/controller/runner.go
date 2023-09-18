@@ -87,11 +87,18 @@ func (r *Runner) Run() {
 
 			r.Controller.Logger.Println("Runner result", r.Exploit.Name, r.Target.Name, flagString)
 
+			var validation string
+			if flagString != "" {
+				validation = "matched"
+			} else {
+				validation = "not matched"
+			}
+
 			flag := &model.Flag{
 				ExploitId: r.Exploit.Id,
 				TargetId:  r.Target.Id,
 				Result:    result,
-				Valid:     flagString != "",
+				Valid:     validation,
 				Flag:      flagString,
 			}
 			r.Flagger <- flag
@@ -202,8 +209,15 @@ func (er *ExploitRunner) Run() {
 		case target := <-er.TargetRemover:
 			er.removeTarget(target)
 		case flag := <-er.Flagger:
-			er.controller.DB.CreateFlag(*flag)
-			SendFlag(*flag)
+			id, err := er.controller.DB.CreateFlag(*flag)
+			if err != nil {
+				er.controller.Logger.Println("ExploitRunner error", "Could not save flag", err)
+				continue
+			}
+			if flag.Valid == "matched" {
+				flag.Id = id
+				go SendFlag(*flag, er.controller)
+			}
 		}
 	}
 }
