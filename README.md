@@ -2,7 +2,7 @@
 
 Addack is a tool to run exploits to multiple targets.
 
-## Instalation
+## Installation
 
 ### Download
 
