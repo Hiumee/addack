@@ -2,12 +2,11 @@
 
 Addack is a tool to run exploits to multiple targets.
 
-![image](https://github.com/Hiumee/addack/assets/42638867/b65f5647-299b-4be9-9bb3-75d764a02647)
+![Addack](https://github.com/Hiumee/addack/assets/42638867/14eb911c-b4b1-41c7-90c9-90b0fb545be4)
 
 ## Installation
 
 ### Download
-
 Download the binary from the [release page](https://github.com/Hiumee/addack/releases)
 
 Make an `exploits` directory in the same directory as the binary. Add a script called `flagger.py` in the `exploits` directory. This script will be called when a flag is found.
