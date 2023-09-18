@@ -1,5 +1,5 @@
 {{ block "flags" . }}
-<div id="flags" hx-trigger="every 10s" hx-get="/flags">
+<div id="flags">
     <div class="overflow-x-auto">
     <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
         <thead>
@@ -46,4 +46,31 @@
 <pre>
 {{ .Result }}
 </pre>
+{{ end }}
+
+{{ block "flags-search" . }}
+<div class="w-2/3 pt-6 px-6 flex gap-4">
+    <form class="w-full overflow-scroll flex gap-4 mb-0 items-center px-4 h-10 border-gray-200 border-2 rounded-t-md border-b-0" method="post" hx-trigger="every 10s" hx-target="#flags" hx-post="/flags">
+        <div class="h-full flex items-center pr-4 border-r-2 border-gray-200">Filter</div>
+
+        <div>Exploit</div>
+        <input type="search" name="exploit" hx-post="/flags" hx-target="#flags" hx-trigger="keyup changed delay:250ms, search" class="w-40 px-2 py-1 rounded-md border-gray-200 border-2" placeholder="Exploit name">
+
+        <div>Target</div>
+        <input type="search" name="target" hx-post="/flags" hx-target="#flags" hx-trigger="keyup changed delay:250ms, search" class="w-40 px-2 py-1 rounded-md border-gray-200 border-2" placeholder="Target name">
+
+        <div>Flag</div>
+        <input type="search" name="flag" hx-post="/flags" hx-target="#flags" hx-trigger="keyup changed delay:250ms, search" class="w-40 px-2 py-1 rounded-md border-gray-200 border-2" placeholder="Flag">
+
+        <div>Valid</div>
+        <select name="valid" hx-post="/flags" hx-target="#flags" class="w-40 px-2 py-1 rounded-md border-gray-200 bg-white border-2">
+            <option value="">Any</option>
+            <option value="true">Valid</option>
+            <option value="false">Invalid</option>
+        </select>
+
+        <div>Content</div>
+        <input type="search" name="content" hx-post="/flags" hx-target="#flags" hx-trigger="keyup changed delay:250ms, search" class="w-40 px-2 py-1 rounded-md border-gray-200 border-2" placeholder="Content">
+    </form>
+</div>
 {{ end }}

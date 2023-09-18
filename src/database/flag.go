@@ -2,6 +2,7 @@ package database
 
 import (
 	"addack/src/model"
+	"database/sql"
 	"time"
 )
 
@@ -29,6 +30,12 @@ func (db *Database) GetFlags(timezone string, timeformat string) ([]model.FlagDT
 		return nil, err
 	}
 	defer rows.Close()
+
+	location, err := time.LoadLocation(timezone)
+	if err != nil {
+		return nil, err
+	}
+
 	for rows.Next() {
 		var flag model.FlagDTO
 		var timestamp string
@@ -40,8 +47,75 @@ func (db *Database) GetFlags(timezone string, timeformat string) ([]model.FlagDT
 		if err != nil {
 			return nil, err
 		}
+		flag.Timestamp = flagTime.In(location).Format(timeformat)
 
-		location, err := time.LoadLocation(timezone)
+		flags = append(flags, flag)
+	}
+
+	return flags, nil
+}
+
+func (db *Database) SearchFlags(timezone string, timeformat string, exploit string, target string, flag string, valid string, content string) ([]model.FlagDTO, error) {
+	var flags []model.FlagDTO
+
+	exploit = "%" + exploit + "%"
+	target = "%" + target + "%"
+	flag = "%" + flag + "%"
+	content = "%" + content + "%"
+
+	var rows *sql.Rows
+
+	if valid != "" {
+		var err error
+		rows, err = db.DB.Query(`
+			SELECT flags.id, flag, exploits.name, targets.name, valid, timestamp FROM flags 
+				INNER JOIN exploits ON exploits.id = flags.exploit_id
+				INNER JOIN targets ON targets.id = flags.target_id
+			WHERE
+				exploits.name LIKE $1 AND
+				targets.name LIKE $2 AND
+				flags.flag LIKE $3 AND
+				valid LIKE $4 AND
+				result LIKE $5
+			ORDER BY flags.id DESC LIMIT 100
+			`, exploit, target, flag, valid == "true", content)
+
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		var err error
+		rows, err = db.DB.Query(`
+			SELECT flags.id, flag, exploits.name, targets.name, valid, timestamp FROM flags 
+				INNER JOIN exploits ON exploits.id = flags.exploit_id
+				INNER JOIN targets ON targets.id = flags.target_id
+			WHERE
+				exploits.name LIKE $1 AND
+				targets.name LIKE $2 AND
+				flags.flag LIKE $3 AND
+				result LIKE $5
+			ORDER BY flags.id DESC LIMIT 100
+			`, exploit, target, flag, content)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	defer rows.Close()
+
+	location, err := time.LoadLocation(timezone)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var flag model.FlagDTO
+		var timestamp string
+		err := rows.Scan(&flag.Id, &flag.Flag, &flag.ExploitName, &flag.TargetName, &flag.Valid, &timestamp)
+		if err != nil {
+			return nil, err
+		}
+		flagTime, err := time.Parse(time.RFC3339, timestamp)
 		if err != nil {
 			return nil, err
 		}

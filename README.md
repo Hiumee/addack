@@ -17,6 +17,15 @@ Run the binary. A `database.db` file and a `exploits` folder will be created in 
 - Go 1.16 or newer
 - npm for tailwind
 
+### Development environment
+
+```bash
+# Compile the css
+npx tailwindcss -i ./assets/css/index.css -o ./assets/css/output.css --watch
+# Run the server using air for auto reload
+air
+```
+
 ### Build
 
 ```bash

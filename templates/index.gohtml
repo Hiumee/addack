@@ -61,8 +61,7 @@
     </header>
 
     <div class="h-full">
-        <div id="tab" class="h-full">
-            {{ template "main" . }}
+        <div id="tab" class="h-full" hx-trigger="load" hx-get="/main">
         </div>
     </div>
 
@@ -138,8 +137,9 @@
             </div>
         </div>
     </div>
-    <div class="h-1/2 p-6 flex gap-4">
-        <div class="grow h-full overflow-scroll border-gray-200 border-2 rounded-md">
+    {{ template "flags-search" . }}
+    <div class="h-1/2 px-6 pb-6 flex gap-4">
+        <div class="grow h-full overflow-scroll border-gray-200 border-2 rounded-b-md">
             <div id="flags" hx-get="/flags" hx-trigger="load" hx-swap="outerHTML">
                 Load flags
             </div>

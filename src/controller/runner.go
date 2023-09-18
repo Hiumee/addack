@@ -203,6 +203,7 @@ func (er *ExploitRunner) Run() {
 			er.removeTarget(target)
 		case flag := <-er.Flagger:
 			er.controller.DB.CreateFlag(*flag)
+			SendFlag(*flag)
 		}
 	}
 }

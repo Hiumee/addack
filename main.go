@@ -4,9 +4,7 @@ import (
 	"addack/src/controller"
 	"addack/src/database"
 	"embed"
-	"io/fs"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -22,10 +20,11 @@ var upgrader = websocket.Upgrader{
 var staticContent embed.FS
 
 func main() {
-	staticFS, err := fs.Sub(staticContent, "assets")
-	if err != nil {
-		panic(err)
-	}
+	// Uncomment if you want to use embedded assets
+	// staticFS, err := fs.Sub(staticContent, "assets")
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	database, err := database.NewDatabase("database.db")
 	if err != nil {
@@ -34,8 +33,7 @@ func main() {
 	defer database.DB.Close()
 
 	ctrl := &controller.Controller{
-		DB:  database,
-		Hub: controller.NewHub(),
+		DB: database,
 		Config: &controller.Config{
 			ExploitsPath: "./exploits",
 			TickTime:     10 * 1000,
@@ -80,40 +78,16 @@ func main() {
 	)
 
 	r.MaxMultipartMemory = 50 << 20 // 50 MiB
-	r.StaticFS("/assets", http.FS(staticFS))
-	LoadHTMLFromEmbedFS(r, staticContent, "templates/*")
+
+	// Switch comments if you want to use embedded assets
+	// r.StaticFS("/assets", http.FS(staticFS))
+	// LoadHTMLFromEmbedFS(r, staticContent, "templates/*")
+	r.Static("/assets", "./assets")
+	r.LoadHTMLGlob("templates/*")
 
 	r.GET("/", ctrl.GetIndex)
 	r.GET("/main", ctrl.GetMain)
 	r.GET("/settings", ctrl.GetSettings)
-
-	// Websocket
-	// r.GET("/ws", func(c *gin.Context) {
-	// 	go func() {
-	// 		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-	// 		if err != nil {
-	// 			return
-	// 		}
-	// 		defer conn.Close()
-	// 		conn.WriteMessage(websocket.TextMessage, []byte("Howdy!"))
-	// 		ctrl.Hub.Register <- conn
-
-	// 		ticker := time.NewTicker(time.Second * 10)
-	// 		defer func() {
-	// 			ticker.Stop()
-	// 			ctrl.Hub.Unregister <- conn
-	// 		}()
-	// 		for {
-	// 			select {
-	// 			case <-ticker.C:
-	// 				err := conn.WriteMessage(websocket.PingMessage, nil)
-	// 				if err != nil {
-	// 					return
-	// 				}
-	// 			}
-	// 		}
-	// 	}()
-	// })
 
 	// Exploit routes
 	r.GET("/exploits", ctrl.GetExploits)
@@ -129,6 +103,7 @@ func main() {
 	r.POST("/target/:id/:enable", ctrl.ToggleTarget)
 	// Flag routes
 	r.GET("/flags", ctrl.GetFlags)
+	r.POST("/flags", ctrl.SearchFlags)
 	r.GET("/flag/:id", ctrl.GetFlag)
 	// Settings routes
 	r.POST("/settings", ctrl.SaveConfig)
