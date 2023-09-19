@@ -29,7 +29,7 @@ func (db *Database) GetTarget(id int64) (model.Target, error) {
 
 func (db *Database) GetTargets() ([]model.Target, error) {
 	var targets []model.Target
-	rows, err := db.DB.Query("SELECT targets.id, targets.name, targets.ip, targets.tag, targets.enabled, count(flags.id) FROM targets LEFT JOIN flags ON targets.id = flags.target_id  AND flags.valid = 1 GROUP BY targets.id")
+	rows, err := db.DB.Query("SELECT targets.id, targets.name, targets.ip, targets.tag, targets.enabled, count(flags.id) FROM targets LEFT JOIN flags ON targets.id = flags.target_id  AND flags.valid = 'valid' GROUP BY targets.id")
 	if err != nil {
 		return targets, err
 	}
