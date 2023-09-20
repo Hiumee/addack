@@ -6,6 +6,8 @@ Addack is a tool to run exploits to multiple targets.
 
 ## Installation
 
+Use a linux distribution or WSL.
+
 ### Download
 Download the binary from the [release page](https://github.com/Hiumee/addack/releases)
 
