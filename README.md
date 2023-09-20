@@ -18,13 +18,17 @@ Run the binary. A `database.db` file will be created in the same directory.
 Default configuration:
 
 ```
-FlaggerCommand: "python3 flagger.py",
-ExploitsPath:   "./exploits",
-TickTime:       10 * 1000,
-FlagRegex:      "FLAG{.*}",
-TimeZone:       "Europe/Bucharest",
-TimeFormat:     "2006-01-02 15:04:05",
+database_path = "./database.db"
+flagger_command = "python3 flagger.py"
+exploits_path = "./exploits"
+tick_time = 10000 # in ms
+flag_regex = "FLAG{.*}"
+timezone = "Europe/Bucharest"
+time_format = "2006-01-02 15:04:05"
+listening_addr = "127.0.0.1:8080"
 ```
+
+You can edit the configuration by editing the `config.toml` file.
 
 Upload scripts and set the command to run. The IP of the target will be set in the `TARGET` environment variable when the script is run.
 

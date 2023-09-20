@@ -9,48 +9,33 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
+	"github.com/pelletier/go-toml/v2"
 )
-
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
 
 //go:embed assets/**/* assets/js/* assets/css/output.css assets/favicon.ico templates/*
 var staticContent embed.FS
 
 func main() {
+	config := readConfig()
+
 	// Comment if you don't want to use embedded FS
 	staticFS, err := fs.Sub(staticContent, "assets")
 	if err != nil {
 		panic(err)
 	}
 
-	database, err := database.NewDatabase("database.db")
+	database, err := database.NewDatabase(config.DatabasePath)
 	if err != nil {
 		panic(err)
 	}
 	defer database.DB.Close()
 
-	defaultRegex := "FLAG{.*}"
-	regex, err := regexp.Compile(defaultRegex)
-	if err != nil {
-		panic(err)
-	}
-
 	ctrl := &controller.Controller{
-		DB: database,
-		Config: &controller.Config{
-			FlaggerCommand: "python3 flagger.py",
-			ExploitsPath:   "./exploits",
-			TickTime:       10 * 1000,
-			FlagRegex:      regex,
-			TimeZone:       "Europe/Bucharest",
-			TimeFormat:     "2006-01-02 15:04:05",
-		},
+		DB:     database,
+		Config: config,
 		Logger: log.New(os.Stdout, "[ExploitRunner] ", log.LstdFlags),
 	}
 	ctrl.ExploitRunner = controller.NewExploitRunner(ctrl)
@@ -119,5 +104,110 @@ func main() {
 	// Settings routes
 	r.POST("/settings", ctrl.SaveConfig)
 
-	r.Run("127.0.0.1:8080") // listen and serve on internal network
+	r.Run(config.ListeningAddr)
+}
+
+func readConfig() *controller.Config {
+
+	defaultRegex := "FLAG{.*}"
+	regex, err := regexp.Compile(defaultRegex)
+	if err != nil {
+		panic(err)
+	}
+
+	// Default values
+	config := &controller.Config{
+		DatabasePath:   "database.db",
+		FlaggerCommand: "python3 flagger.py",
+		ExploitsPath:   "./exploits",
+		TickTime:       10 * 1000,
+		FlagRegex:      regex,
+		TimeZone:       "Europe/Bucharest",
+		TimeFormat:     "2006-01-02 15:04:05",
+	}
+
+	f, err := os.ReadFile("config.toml")
+	if err != nil {
+		log.Println("No config file found, using default values")
+		return config
+	}
+
+	var data map[interface{}]interface{}
+
+	err = toml.Unmarshal(f, &data)
+
+	if err != nil {
+		log.Println("Error reading config file, using default values")
+		return config
+	}
+
+	if data["database_path"] != nil {
+		switch data["database_path"].(type) {
+		case string:
+			config.DatabasePath = data["database_path"].(string)
+		}
+	}
+
+	if data["flagger_command"] != nil {
+		switch data["flagger_command"].(type) {
+		case string:
+			config.FlaggerCommand = data["flagger_command"].(string)
+		}
+	}
+
+	if data["exploits_path"] != nil {
+		switch data["exploits_path"].(type) {
+		case string:
+			config.ExploitsPath = data["exploits_path"].(string)
+		}
+	}
+
+	if data["tick_time"] != nil {
+		switch data["tick_time"].(type) {
+		case string:
+			length, err := strconv.ParseInt(data["tick_time"].(string), 10, 64)
+			if err != nil {
+				log.Println("Invalid tick time, using default value")
+			} else {
+				config.TickTime = length
+			}
+		case int64:
+			config.TickTime = data["tick_time"].(int64)
+		}
+	}
+
+	if data["flag_regex"] != nil {
+		switch data["flag_regex"].(type) {
+		case string:
+			regexString := data["flag_regex"].(string)
+			regex, err := regexp.Compile(regexString)
+			if err != nil {
+				panic(err)
+			}
+			config.FlagRegex = regex
+		}
+	}
+
+	if data["timezone"] != nil {
+		switch data["timezone"].(type) {
+		case string:
+			config.TimeZone = data["timezone"].(string)
+		}
+	}
+
+	if data["time_format"] != nil {
+		switch data["time_format"].(type) {
+		case string:
+			config.TimeFormat = data["time_format"].(string)
+		}
+	}
+
+	if data["listening_addr"] != nil {
+		switch data["listening_addr"].(type) {
+		case string:
+			config.ListeningAddr = data["listening_addr"].(string)
+		}
+	}
+
+	return config
 }

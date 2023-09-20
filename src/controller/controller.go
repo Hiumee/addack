@@ -10,12 +10,14 @@ import (
 )
 
 type Config struct {
+	DatabasePath   string
 	ExploitsPath   string
 	TickTime       int64
 	FlagRegex      *regexp.Regexp
 	TimeZone       string
 	TimeFormat     string
 	FlaggerCommand string
+	ListeningAddr  string
 }
 
 type Controller struct {
