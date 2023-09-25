@@ -27,6 +27,7 @@ type ExploitRunner struct {
 	runner         map[int64]map[int64]*Runner
 	runnerLock     sync.RWMutex
 	Flagger        chan *model.Flag
+	Notify         chan string
 	controller     *Controller
 }
 
@@ -117,6 +118,7 @@ func NewExploitRunner(controller *Controller) *ExploitRunner {
 		runnerLock:     sync.RWMutex{},
 		Flagger:        make(chan *model.Flag, 30),
 		controller:     controller,
+		Notify:         make(chan string),
 	}
 }
 
@@ -218,6 +220,18 @@ func (er *ExploitRunner) Run() {
 				flag.Id = id
 				go SendFlag(*flag, er.controller)
 			}
+		case <-er.Notify:
+			er.controller.Logger.Println("ExploitRunner stopped")
+			return
 		}
 	}
+}
+
+func (er *ExploitRunner) Stop() {
+	for _, exploit := range er.exploits {
+		for _, runner := range er.runner[exploit.Id] {
+			runner.Notify <- "stop"
+		}
+	}
+	er.Notify <- "stop"
 }

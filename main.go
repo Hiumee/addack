@@ -4,10 +4,12 @@ import (
 	"addack/src/controller"
 	"addack/src/database"
 	"embed"
+	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"regexp"
 	"strconv"
 
@@ -39,6 +41,19 @@ func main() {
 		Logger: log.New(os.Stdout, "[ExploitRunner] ", log.LstdFlags),
 	}
 	ctrl.ExploitRunner = controller.NewExploitRunner(ctrl)
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		// Handle Ctrl+C
+		<-c
+		fmt.Println("Shutting down...")
+		ctrl.ExploitRunner.Stop()
+		database.DB.Exec("PRAGMA wal_checkpoint")
+		database.DB.Close()
+		os.Exit(0)
+
+	}()
 
 	go ctrl.ExploitRunner.Run()
 
