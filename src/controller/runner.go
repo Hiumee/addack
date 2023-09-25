@@ -141,6 +141,10 @@ func (er *ExploitRunner) removeExploit(exploit *model.Exploit) {
 	er.runnerLock.Lock()
 	defer er.runnerLock.Unlock()
 
+	if _, ok := er.exploits[exploit.Id]; !ok {
+		return
+	}
+
 	delete(er.exploits, exploit.Id)
 
 	runners := []*Runner{}
@@ -178,6 +182,9 @@ func (er *ExploitRunner) removeTarget(target *model.Target) {
 	er.runnerLock.Lock()
 	defer er.runnerLock.Unlock()
 
+	if _, ok := er.targets[target.Id]; !ok {
+		return
+	}
 	delete(er.targets, target.Id)
 
 	for id, exploit := range er.runner {
