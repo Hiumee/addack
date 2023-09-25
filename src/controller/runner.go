@@ -75,27 +75,28 @@ func (r *Runner) Run() {
 			return
 		case <-done:
 			result := string(output.Bytes())
-			flagString := ""
 
-			flagString = r.Controller.Config.FlagRegex.FindString(result)
+			flagStrings := r.Controller.Config.FlagRegex.FindAllString(result, 100)
 
-			r.Controller.Logger.Println("Runner result", r.Exploit.Name, r.Target.Name, flagString)
+			for _, flagString := range flagStrings {
+				r.Controller.Logger.Println("Runner result", r.Exploit.Name, r.Target.Name, flagString)
 
-			var validation string
-			if flagString != "" {
-				validation = "matched"
-			} else {
-				validation = "not matched"
+				var validation string
+				if flagString != "" {
+					validation = "matched"
+				} else {
+					validation = "not matched"
+				}
+
+				flag := &model.Flag{
+					ExploitId: r.Exploit.Id,
+					TargetId:  r.Target.Id,
+					Result:    result,
+					Valid:     validation,
+					Flag:      flagString,
+				}
+				r.Flagger <- flag
 			}
-
-			flag := &model.Flag{
-				ExploitId: r.Exploit.Id,
-				TargetId:  r.Target.Id,
-				Result:    result,
-				Valid:     validation,
-				Flag:      flagString,
-			}
-			r.Flagger <- flag
 		case <-timer.C:
 			<-tickTicker.C
 		}
@@ -116,7 +117,7 @@ func NewExploitRunner(controller *Controller) *ExploitRunner {
 		TargetRemover:  make(chan *model.Target, 5),
 		runner:         make(map[int64]map[int64]*Runner),
 		runnerLock:     sync.RWMutex{},
-		Flagger:        make(chan *model.Flag, 30),
+		Flagger:        make(chan *model.Flag, 3000),
 		controller:     controller,
 		Notify:         make(chan string),
 	}
