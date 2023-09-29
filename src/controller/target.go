@@ -1,9 +1,10 @@
 package controller
 
 import (
-	"addack/src/model"
 	"net/http"
 	"strconv"
+
+	"github.com/hiumee/addack/src/model"
 
 	"github.com/gin-gonic/gin"
 )

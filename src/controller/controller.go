@@ -1,10 +1,11 @@
 package controller
 
 import (
-	"addack/src/database"
 	"log"
 	"net/http"
 	"regexp"
+
+	"github.com/hiumee/addack/src/database"
 
 	"github.com/gin-gonic/gin"
 )

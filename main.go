@@ -1,8 +1,6 @@
 package main
 
 import (
-	"addack/src/controller"
-	"addack/src/database"
 	"embed"
 	"fmt"
 	"io/fs"
@@ -12,6 +10,9 @@ import (
 	"os/signal"
 	"regexp"
 	"strconv"
+
+	"github.com/hiumee/addack/src/controller"
+	"github.com/hiumee/addack/src/database"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pelletier/go-toml/v2"

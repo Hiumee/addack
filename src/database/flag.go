@@ -1,8 +1,9 @@
 package database
 
 import (
-	"addack/src/model"
 	"time"
+
+	"github.com/hiumee/addack/src/model"
 )
 
 func (db *Database) CreateFlagsTable() error {

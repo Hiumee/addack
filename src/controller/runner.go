@@ -1,12 +1,13 @@
 package controller
 
 import (
-	"addack/src/model"
 	"bytes"
 	"io"
 	"os/exec"
 	"sync"
 	"time"
+
+	"github.com/hiumee/addack/src/model"
 )
 
 type Runner struct {

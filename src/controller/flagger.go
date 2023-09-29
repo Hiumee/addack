@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"addack/src/model"
 	"bytes"
 	"io"
 	"os/exec"
 	"strings"
+
+	"github.com/hiumee/addack/src/model"
 )
 
 func SendFlag(flag model.Flag, controller *Controller) {
