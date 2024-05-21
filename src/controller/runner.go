@@ -98,6 +98,17 @@ func (r *Runner) Run() {
 				}
 				r.Flagger <- flag
 			}
+
+			if len(flagStrings) == 0 {
+				flag := &model.Flag{
+					ExploitId: r.Exploit.Id,
+					TargetId:  r.Target.Id,
+					Result:    result,
+					Valid:     "not matched",
+					Flag:      "",
+				}
+				r.Flagger <- flag
+			}
 		case <-timer.C:
 			<-tickTicker.C
 		}
@@ -213,6 +224,10 @@ func (er *ExploitRunner) Run() {
 		case target := <-er.TargetRemover:
 			er.removeTarget(target)
 		case flag := <-er.Flagger:
+			if flag.Flag == "" {
+				er.controller.DB.CreateFlag(*flag)
+				continue
+			}
 			flagExists := er.controller.DB.FlagExists(flag.Flag)
 			if flagExists {
 				flag.Valid = "duplicate"

@@ -35,9 +35,15 @@ func (fs *FlagSubmitter) QueueFlag(flag model.Flag) {
 	fs.flagQueue <- flag
 }
 
-func (fs *FlagSubmitter) Run() {
+func (fs *FlagSubmitter) Run(matchedFlags []model.Flag) {
 	ticker := time.NewTicker(fs.tickFreq)
 	defer ticker.Stop()
+
+	go func() {
+		for _, flag := range matchedFlags {
+			fs.QueueFlag(flag)
+		}
+	}()
 
 	flags := make([]model.Flag, 0)
 

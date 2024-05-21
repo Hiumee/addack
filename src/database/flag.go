@@ -68,6 +68,10 @@ func (db *Database) GetFlags(timezone string, timeformat string) ([]model.FlagDT
 	return flags, nil
 }
 
+func (db *Database) GetMatchedFlags() []model.Flag {
+	return db.GetFlagsCustomQuery("SELECT id, flag, exploit_id, target_id, result, valid FROM flags WHERE valid = 'matched'")
+}
+
 func (db *Database) SearchFlags(timezone string, timeformat string, exploit string, target string, flag string, valid string, content string) ([]model.FlagDTO, error) {
 	var flags []model.FlagDTO
 

@@ -59,8 +59,9 @@ func main() {
 
 	}()
 
+	matchedFlags := ctrl.DB.GetMatchedFlags()
+	go ctrl.FlagSubmitter.Run(matchedFlags)
 	go ctrl.ExploitRunner.Run()
-	go ctrl.FlagSubmitter.Run()
 
 	{
 		exploits, err := ctrl.DB.GetExploits()
