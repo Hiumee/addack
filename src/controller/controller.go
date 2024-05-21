@@ -19,6 +19,8 @@ type Config struct {
 	TimeFormat     string
 	FlaggerCommand string
 	ListeningAddr  string
+	SendFlagTick   int64
+	FlagMaxNum     int64
 }
 
 type Controller struct {
@@ -26,6 +28,7 @@ type Controller struct {
 	Config        *Config
 	ExploitRunner *ExploitRunner
 	Logger        *log.Logger
+	FlagSubmitter *FlagSubmitter
 }
 
 func (c *Controller) GetIndex(context *gin.Context) {

@@ -8,6 +8,10 @@ import (
 
 func (db *Database) CreateFlagsTable() error {
 	_, err := db.DB.Exec("CREATE TABLE IF NOT EXISTS flags (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, flag TEXT, exploit_id INTEGER, target_id INTEGER, result TEXT, valid TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")
+	if err != nil {
+		return err
+	}
+	_, err = db.DB.Exec("CREATE INDEX IF NOT EXISTS flag_index ON flags (flag)")
 	return err
 }
 
@@ -21,6 +25,15 @@ func (db *Database) CreateFlag(flag model.Flag) (int64, error) {
 	id, err := res.LastInsertId()
 
 	return id, nil
+}
+
+func (db *Database) FlagExists(flag string) bool {
+	var id int64
+	err := db.DB.QueryRow("SELECT id FROM flags WHERE flag = $1", flag).Scan(&id)
+	if err != nil {
+		return false
+	}
+	return true
 }
 
 func (db *Database) GetFlags(timezone string, timeformat string) ([]model.FlagDTO, error) {

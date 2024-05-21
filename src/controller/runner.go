@@ -213,14 +213,19 @@ func (er *ExploitRunner) Run() {
 		case target := <-er.TargetRemover:
 			er.removeTarget(target)
 		case flag := <-er.Flagger:
+			flagExists := er.controller.DB.FlagExists(flag.Flag)
+			if flagExists {
+				flag.Valid = "duplicate"
+				er.controller.Logger.Println("ExploitRunner result", "Duplicate flag", flag.Flag)
+			}
 			id, err := er.controller.DB.CreateFlag(*flag)
 			if err != nil {
 				er.controller.Logger.Println("ExploitRunner error", "Could not save flag", err)
 				continue
 			}
-			if er.controller.Config.FlaggerCommand != "" && flag.Valid == "matched" {
+			if !flagExists && er.controller.Config.FlaggerCommand != "" && flag.Valid == "matched" {
 				flag.Id = id
-				go SendFlag(*flag, er.controller)
+				go er.controller.FlagSubmitter.QueueFlag(*flag)
 			}
 		case <-er.Notify:
 			er.controller.Logger.Println("ExploitRunner stopped")

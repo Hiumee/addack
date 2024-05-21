@@ -4,28 +4,28 @@
     <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
         <thead>
         <tr>
-            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900 text-left">
+            <th class="whitespace-nowrap px-1 xl:px-4 py-2 font-medium text-gray-900 text-left">
             ID
             </th>
-            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            <th class="whitespace-nowrap px-1 xl:px-4 py-2 font-medium text-gray-900">
             Exploit
             </th>
-            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            <th class="whitespace-nowrap px-1 xl:px-4 py-2 font-medium text-gray-900">
             Target
             </th>
-            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            <th class="whitespace-nowrap px-1 xl:px-4 py-2 font-medium text-gray-900">
             Status
             </th>
-            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            <th class="whitespace-nowrap px-1 xl:px-4 py-2 w-32 max-w-32 font-medium text-gray-900">
             Flag
             </th>
-            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            <th class="whitespace-nowrap px-1 xl:px-4 py-2 font-medium text-gray-900">
             Timestamp
             </th>
         </tr>
         </thead>
 
-        <tbody id="flags-table" class="divide-y divide-gray-200">
+        <tbody id="flags-table" class="divide-y h-full divide-gray-200">
         {{ range .Flags }}
             {{ template "flag-row" . }}
         {{ end }}
@@ -37,12 +37,12 @@
 
 {{ block "flag-row" . }}
 <tr hx-trigger="click" hx-target="#flag-preview" hx-swap="innerHTML" hx-get="/flag/{{ .Id }}" class="{{ if eq .Valid "valid" }}bg-green-50{{ else if eq .Valid "matched" }}bg-yellow-50{{ else }}bg-red-50{{ end }}">
-    <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ .Id }}</td>
-    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .ExploitName }}</td>
-    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .TargetName }}</td>
-    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Valid }}</td>
-    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Flag }}</td>
-    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Timestamp }}</td>
+    <td class="whitespace-nowrap px-1 xl:px-4 py-2 font-medium text-gray-900">{{ .Id }}</td>
+    <td class="whitespace-nowrap px-1 xl:px-4 text-center py-2 text-gray-700">{{ .ExploitName }}</td>
+    <td class="whitespace-nowrap px-1 xl:px-4 text-center py-2 text-gray-700">{{ .TargetName }}</td>
+    <td class="whitespace-nowrap px-1 xl:px-4 text-center py-2 text-gray-700">{{ .Valid }}</td>
+    <td class="whitespace-nowrap px-1 xl:px-4 w-32 max-w-32 text-center py-2 text-gray-700"><p class="overflow-x-auto">{{ .Flag }}</p></td>
+    <td class="whitespace-nowrap px-1 xl:px-4 text-center py-2 text-gray-700">{{ .Timestamp }}</td>
 </tr>
 {{ end }}
 
@@ -53,8 +53,8 @@
 {{ end }}
 
 {{ block "flags-search" . }}
-<div class="w-2/3 pt-6 px-6 flex gap-4">
-    <form class="w-full overflow-scroll flex gap-4 mb-0 items-center px-4 h-10 border-gray-200 border-2 rounded-t-md border-b-0" method="post" hx-trigger="every 10s" hx-target="#flags" hx-post="/flags">
+<div class="w-full pt-6 px-6 flex gap-4">
+    <form class="w-full overflow-scroll flex gap-4 mb-0 items-center px-4 h-10 border-gray-200 border-2 rounded-t-md" method="post" hx-trigger="every 10s" hx-target="#flags" hx-post="/flags">
         <div class="h-full flex items-center pr-4 border-r-2 border-gray-200">Filter</div>
 
         <div>Exploit</div>

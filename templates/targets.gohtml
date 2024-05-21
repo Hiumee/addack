@@ -11,10 +11,13 @@
             IP
             </th>
             <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-            Tag
+            Flags
             </th>
             <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-            Flags
+            Flags (last 5 minutes)
+            </th>
+            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            Tag
             </th>
             <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
             Toggle
@@ -22,7 +25,7 @@
             <th class="px-4 py-2 w-16">
                 <button hx-delete="/targets"
                     href="#"
-                    class="inline-block rounded bg-red-400 w-full py-2 text-xs font-medium text-white hover:bg-red-500"
+                    class="inline-block whitespace-nowrap rounded bg-red-400 w-full py-2 px-1 text-xs font-medium text-white hover:bg-red-500"
                     hx-target="#targets"
                     hx-confirm="Are you sure you want to delete ALL targets?"
                     hx-swap="outerHTML"
@@ -45,12 +48,11 @@
 
 {{ block "target-row" . }}
 <tr>
-    <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-    {{ .Name }}
-    </td>
+    <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ .Name }}</td>
     <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Ip }}</td>
-    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Tag }}</td>
     <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Flags }}</td>
+    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .FlagsLast5Minutes }}</td>
+    <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Tag }}</td>
     <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700" hx-disinherit="hx-confirm">
         {{ if .Enabled }}
             <button hx-post="/target/{{ .Id }}/disable"
@@ -85,12 +87,11 @@
 {{ block "target-row-new" .}}
 <tbody hx-swap-oob="beforeend:#targets-table">
     <tr>
-        <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-        {{ .Name }}
-        </td>
+        <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ .Name }}</td>
         <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Ip }}</td>
         <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Tag }}</td>
         <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .Flags }}</td>
+        <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700">{{ .FlagsLast5Minutes }}</td>
         <td class="whitespace-nowrap px-4 text-center py-2 text-gray-700" hx-disinherit="hx-confirm">
             {{ if .Enabled }}
                 <button hx-post="/target/{{ .Id }}/disable"

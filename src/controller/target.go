@@ -47,7 +47,7 @@ func (c *Controller) CreateTarget(context *gin.Context) {
 		c.ExploitRunner.TargetAdder <- &tg
 	}
 
-	context.HTML(http.StatusOK, "target-row-new", gin.H{"Name": target.Name, "Id": id, "Ip": target.Ip, "Notice": "Target created", "Tag": target.Tag, "Enabled": target.Enabled, "Flags": 0})
+	context.HTML(http.StatusOK, "target-row-new", gin.H{"Name": target.Name, "Id": id, "Ip": target.Ip, "Notice": "Target created", "Tag": target.Tag, "Enabled": target.Enabled, "Flags": 0, "FlagsLast5Minutes": 0})
 	return
 }
 

@@ -29,14 +29,14 @@ func (db *Database) GetTarget(id int64) (model.Target, error) {
 
 func (db *Database) GetTargets() ([]model.Target, error) {
 	var targets []model.Target
-	rows, err := db.DB.Query("SELECT targets.id, targets.name, targets.ip, targets.tag, targets.enabled, count(flags.id) FROM targets LEFT JOIN flags ON targets.id = flags.target_id  AND flags.valid = 'valid' GROUP BY targets.id")
+	rows, err := db.DB.Query("SELECT targets.id, targets.name, targets.ip, targets.tag, targets.enabled, (select count(*) from flags where flags.exploit_id = targets.id and flags.valid = 'valid'), (select count(*) from flags where flags.exploit_id = targets.id and flags.valid = 'valid' and flags.timestamp > datetime('now', '-5 minutes')) FROM targets")
 	if err != nil {
 		return targets, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var target model.Target
-		err := rows.Scan(&target.Id, &target.Name, &target.Ip, &target.Tag, &target.Enabled, &target.Flags)
+		err := rows.Scan(&target.Id, &target.Name, &target.Ip, &target.Tag, &target.Enabled, &target.Flags, &target.FlagsLast5Minutes)
 		if err != nil {
 			return targets, err
 		}

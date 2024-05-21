@@ -18,6 +18,8 @@ import (
 	"github.com/pelletier/go-toml/v2"
 )
 
+var USE_STATIC_FS = false
+
 //go:embed assets/**/* assets/js/* assets/css/output.css assets/favicon.ico templates/*
 var staticContent embed.FS
 
@@ -42,6 +44,7 @@ func main() {
 		Logger: log.New(os.Stdout, "[ExploitRunner] ", log.LstdFlags),
 	}
 	ctrl.ExploitRunner = controller.NewExploitRunner(ctrl)
+	ctrl.FlagSubmitter = controller.NewFlagSubmitter(ctrl)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -57,6 +60,7 @@ func main() {
 	}()
 
 	go ctrl.ExploitRunner.Run()
+	go ctrl.FlagSubmitter.Run()
 
 	{
 		exploits, err := ctrl.DB.GetExploits()
@@ -92,10 +96,13 @@ func main() {
 	r.MaxMultipartMemory = 50 << 20 // 50 MiB
 
 	// Switch comments if you don't want to use embedded FS
-	r.StaticFS("/assets", http.FS(staticFS))
-	LoadHTMLFromEmbedFS(r, staticContent, "templates/*")
-	// r.Static("/assets", "./assets")
-	// r.LoadHTMLGlob("templates/*")
+	if USE_STATIC_FS {
+		r.StaticFS("/assets", http.FS(staticFS))
+		LoadHTMLFromEmbedFS(r, staticContent, "templates/*")
+	} else {
+		r.Static("/assets", "./assets")
+		r.LoadHTMLGlob("templates/*")
+	}
 
 	r.GET("/", ctrl.GetIndex)
 	r.GET("/main", ctrl.GetMain)
@@ -140,6 +147,8 @@ func readConfig() *controller.Config {
 		FlagRegex:      regex,
 		TimeZone:       "Europe/Bucharest",
 		TimeFormat:     "2006-01-02 15:04:05",
+		SendFlagTick:   5 * 1000,
+		FlagMaxNum:     10,
 	}
 
 	f, err := os.ReadFile("config.toml")
@@ -222,6 +231,34 @@ func readConfig() *controller.Config {
 		switch data["listening_addr"].(type) {
 		case string:
 			config.ListeningAddr = data["listening_addr"].(string)
+		}
+	}
+
+	if data["send_flag_tick"] != nil {
+		switch data["send_flag_tick"].(type) {
+		case string:
+			length, err := strconv.ParseInt(data["send_flag_tick"].(string), 10, 64)
+			if err != nil {
+				log.Println("Invalid tick time, using default value")
+			} else {
+				config.SendFlagTick = length
+			}
+		case int64:
+			config.SendFlagTick = data["send_flag_tick"].(int64)
+		}
+	}
+
+	if data["flag_max_num"] != nil {
+		switch data["flag_max_num"].(type) {
+		case string:
+			length, err := strconv.ParseInt(data["flag_max_num"].(string), 10, 64)
+			if err != nil {
+				log.Println("Invalid tick time, using default value")
+			} else {
+				config.FlagMaxNum = length
+			}
+		case int64:
+			config.FlagMaxNum = data["flag_max_num"].(int64)
 		}
 	}
 
