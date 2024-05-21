@@ -18,7 +18,7 @@ import (
 	"github.com/pelletier/go-toml/v2"
 )
 
-var USE_STATIC_FS = false
+var USE_STATIC_FS = true
 
 //go:embed assets/**/* assets/js/* assets/css/output.css assets/favicon.ico templates/*
 var staticContent embed.FS
