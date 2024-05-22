@@ -56,7 +56,6 @@ func main() {
 		database.DB.Exec("PRAGMA wal_checkpoint")
 		database.DB.Close()
 		os.Exit(0)
-
 	}()
 
 	matchedFlags := ctrl.DB.GetMatchedFlags()
@@ -118,6 +117,7 @@ func main() {
 	// Target routes
 	r.GET("/targets", ctrl.GetTargets)
 	r.POST("/targets", ctrl.CreateTarget)
+	r.POST("/targets_multiple", ctrl.CreateTargets)
 	r.DELETE("/targets", ctrl.DeleteAllTargets)
 	r.DELETE("/target/:id", ctrl.DeleteTarget)
 	r.POST("/target/:id/:enable", ctrl.ToggleTarget)

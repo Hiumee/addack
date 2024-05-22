@@ -51,6 +51,49 @@ func (c *Controller) CreateTarget(context *gin.Context) {
 	return
 }
 
+func (c *Controller) CreateTargets(context *gin.Context) {
+	var targets []model.Target
+
+	err := context.BindJSON(&targets)
+	if err != nil {
+		SendError(context, err.Error())
+		return
+	}
+
+	for _, target := range targets {
+		var t model.Target
+
+		t.Name = target.Name
+		t.Ip = target.Ip
+		t.Tag = target.Tag
+		t.Enabled = true
+
+		if t.Name == "" || t.Ip == "" {
+			SendError(context, "Name and IP fields must be filled out")
+			return
+		}
+
+		id, err := c.DB.CreateTarget(t)
+		if err != nil {
+			SendError(context, err.Error())
+			return
+		}
+
+		t.Id = id
+
+		targets = append(targets, t)
+	}
+
+	for _, target := range targets {
+		if target.Enabled {
+			tg := target
+			c.ExploitRunner.TargetAdder <- &tg
+		}
+	}
+
+	context.HTML(http.StatusOK, "notice", gin.H{"Notice": "Targets created"})
+}
+
 func (c *Controller) DeleteTarget(context *gin.Context) {
 	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
 	if err != nil {

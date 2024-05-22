@@ -33,17 +33,14 @@ type Controller struct {
 
 func (c *Controller) GetIndex(context *gin.Context) {
 	context.HTML(http.StatusOK, "index", gin.H{"Config": c.Config})
-	return
 }
 
 func (c *Controller) GetMain(context *gin.Context) {
 	context.HTML(http.StatusOK, "main", gin.H{"Config": c.Config})
-	return
 }
 
 func (c *Controller) GetSettings(context *gin.Context) {
 	context.HTML(http.StatusOK, "settings", gin.H{"Config": c.Config})
-	return
 }
 
 func SendError(context *gin.Context, err string) {

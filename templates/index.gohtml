@@ -138,12 +138,12 @@
     </div>
     {{ template "flags-search" . }}
     <div class="h-3/5 xl:h-1/2 px-6 pb-6 flex">
-        <div class="grow h-full overflow-scroll border-gray-200 border-2 rounded-b-md">
+        <div class="grow h-full overflow-scroll border-gray-200 border-2 rounded-bl-md">
             <div id="flags" hx-get="/flags" hx-trigger="load" hx-swap="outerHTML">
                 Load flags
             </div>
         </div>
-        <div class="w-1/3 h-full overflow-scroll border-gray-200 border-2 rounded-b-md">
+        <div class="w-1/3 h-full overflow-scroll border-gray-200 border-2 rounded-br-md">
             <div id="flag-preview" class="h-full p-2">
                 Select a flag to preview
             </div>
